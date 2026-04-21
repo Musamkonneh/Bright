@@ -1,0 +1,3397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theresy Brighter Future Education Center - School Management System</title>
+    <style>
+        /* Global Styles */
+        :root {
+            --primary-color: #FFD700; /* Yellow */
+            --secondary-color: #000080; /* Navy Blue */
+            --dark-color: #000033; /* Dark Navy */
+            --light-color: #FFFFF0; /* Ivory */
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --text-dark: #333;
+            --text-light: #fff;
+        }
+        /* (JS listener moved to script body) */
+
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 1rem;
+        }
+        
+        nav ul li a {
+            color: var(--primary-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            display: flex;
+            min-height: calc(100vh - 120px);
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--secondary-color);
+            padding: 1rem;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .sidebar h3 {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .sidebar ul {
+            list-style: none;
+        }
+        
+        .sidebar ul li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar ul li a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar ul li a:hover, .sidebar ul li a.active {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+        }
+        
+        .content {
+            flex: 1;
+            padding: 2rem;
+            background-color: white;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Dashboard Styles */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            border: 1px solid var(--primary-color);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card h3 {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .card p {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table th {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+        }
+        
+        table tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            border-color: var(--primary-color);
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #219653;
+        }
+        
+        /* Alert Styles */
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+        }
+        
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
+        }
+        
+        /* Photo Upload Styles */
+        .photo-upload {
+            margin: 1rem 0;
+        }
+        
+        .photo-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            margin: 0.5rem 0;
+        }
+        
+        .photo-placeholder {
+            width: 100px;
+            height: 100px;
+            background-color: #eee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0.5rem 0;
+            color: #777;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        
+        /* Grade coloring: pass (>=70) blue, fail (<70) red */
+        .grade-pass {
+            color: #0b5ed7; /* blue */
+            font-weight: 600;
+        }
+
+        .grade-fail {
+            color: #d9534f; /* red */
+            font-weight: 600;
+        }
+        
+        .id-number {
+            font-family: monospace;
+            background-color: #f5f5f5;
+            padding: 0.3rem;
+            border-radius: 4px;
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        /* Table cell adjustments for photos */
+        table td.photo-cell {
+            width: 120px;
+        }
+        
+        table td.photo-cell img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+        }
+        
+        /* Utility Classes */
+        .text-center {
+            text-align: center;
+        }
+        
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mt-4 { margin-top: 2rem; }
+        
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 2rem; }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Role-based styles */
+        .admin-only {
+            display: none;
+        }
+        
+        .teacher-only {
+            display: none;
+        }
+        
+        .student-only {
+            display: none;
+        }
+        
+        body.admin .admin-only {
+            display: block;
+        }
+        
+        body.teacher .teacher-only {
+            display: block;
+        }
+        
+        body.student .student-only {
+            display: block;
+        }
+        
+        /* School Banner */
+        .school-banner {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .school-banner h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .school-banner p {
+            font-style: italic;
+        }
+        
+        /* Responsive base: fluid typography and images */
+        html {
+            /* fluid base font-size between 14px and 18px depending on viewport width */
+            font-size: clamp(14px, 1.2vw + 12px, 18px);
+        }
+
+        img, .photo-preview, .photo-placeholder {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Make login box fluid on small devices */
+        .login-box {
+            width: min(420px, 92%);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+                justify-content: center;
+            }
+
+            /* Tables become scrollable */
+            .table-container {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 600px;
+            }
+
+            /* Forms stack vertically */
+            .form-row {
+                flex-direction: column;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+
+            /* Modals adjust size */
+            .modal-content {
+                width: 95%;
+                max-width: none;
+            }
+
+            /* Cards in grid */
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Extra small screens (phones) */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 10px;
+            }
+
+            .login-box {
+                width: 98%;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                padding: 0.5rem;
+            }
+
+            .sidebar h3 {
+                font-size: 1.2rem;
+            }
+
+            /* Hide some nav items or make smaller */
+            nav ul li a {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            /* Buttons full width */
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Inputs full width */
+            input, select, textarea {
+                width: 100%;
+            }
+
+            /* Tables very scrollable */
+            table {
+                font-size: 0.8rem;
+            }
+
+            /* Dashboard cards */
+            .dashboard-card {
+                padding: 1rem;
+            }
+
+            .dashboard-card h4 {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Medium screens (tablets) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+            }
+
+            .dashboard-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Large screens */
+        @media (min-width: 1025px) {
+            .container {
+                max-width: 1400px;
+            }
+
+            .dashboard-cards {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page (Visible by default) -->
+    <div id="login-page" class="login-container">
+        <div class="login-box">
+            <h2>Theresy Brighter Future Education Center</h2>
+            <p class="text-center mb-3">School Management System</p>
+            <div id="login-alert" class="alert alert-danger hidden"></div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-role">Role</label>
+                    <select id="login-role" required>
+                        <option value="">Select Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="student">Student</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%;">Login</button>
+            </form>
+            <p class="text-center mt-2">Don't have an account? <a href="#" id="show-register">Register</a></p>
+        </div>
+    </div>
+
+    <!-- Register Page (Hidden by default) -->
+    <div id="register-page" class="login-container hidden">
+        <div class="login-box">
+            <h2>Create Account</h2>
+            <p class="text-center mb-3">Theresy Brighter Future Education Center</p>
+            <div id="register-alert" class="alert alert-danger hidden"></div>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-username">Username</label>
+                    <input type="text" id="register-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-role">Role</label>
+                    <select id="register-role" required>
+                        <option value="">Select Role</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="student">Student</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+            </form>
+            <p class="text-center mt-2">Already have an account? <a href="#" id="show-login">Login</a></p>
+        </div>
+    </div>
+
+    <!-- Main App (Hidden by default) -->
+    <div id="app" class="hidden">
+        <header>
+            <div class="container header-container">
+                <div class="logo">Theresy Brighter Future</div>
+                <nav>
+                    <ul>
+                        <li><a href="#" data-page="dashboard">Dashboard</a></li>
+                        <li class="admin-only teacher-only"><a href="#" data-page="students">Students</a></li>
+                        <li class="admin-only"><a href="#" data-page="teachers">Teachers</a></li>
+                        <li class="admin-only teacher-only"><a href="#" data-page="classes">Classes</a></li>
+                        <li class="teacher-only"><a href="#" data-page="attendance">Attendance</a></li>
+                        <li class="teacher-only"><a href="#" data-page="grades">Grades</a></li>
+                        <li class="student-only"><a href="#" data-page="my-grades">My Grades</a></li>
+                        <li class="student-only"><a href="#" data-page="my-attendance">My Attendance</a></li>
+                        <li><a href="#" id="logout">Logout</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>Menu</h3>
+                <ul>
+                    <li><a href="#" data-page="dashboard" class="active">Dashboard</a></li>
+                    <li class="admin-only teacher-only"><a href="#" data-page="students">Students</a></li>
+                    <li class="admin-only"><a href="#" data-page="teachers">Teachers</a></li>
+                    <li class="admin-only teacher-only"><a href="#" data-page="classes">Classes</a></li>
+                    <li class="teacher-only"><a href="#" data-page="attendance">Attendance</a></li>
+                    <li class="teacher-only"><a href="#" data-page="grades">Grades</a></li>
+                    <li class="student-only"><a href="#" data-page="my-grades">My Grades</a></li>
+                    <li class="student-only"><a href="#" data-page="my-attendance">My Attendance</a></li>
+                </ul>
+            </div>
+
+            <div class="content">
+                <!-- School Banner -->
+                <div class="school-banner">
+                    <h1>Theresy Brighter Future Education Center</h1>
+                    <p>Empowering students for a brighter tomorrow</p>
+                </div>
+                
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="page">
+                    <h1>Dashboard</h1>
+                    <!-- Student Profile Info -->
+                    <div class="student-only" id="student-profile-info" style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
+                        <div id="student-profile-photo"></div>
+                        <div>
+                            <div><strong>Full Name:</strong> <span id="student-profile-name"></span></div>
+                            <div><strong>ID Number:</strong> <span id="student-profile-id"></span></div>
+                        </div>
+                    </div>
+                    <!-- Teacher Profile Info -->
+                    <div class="teacher-only" id="teacher-profile-info" style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
+                        <div id="teacher-profile-photo"></div>
+                        <div>
+                            <div><strong>Full Name:</strong> <span id="teacher-profile-name"></span></div>
+                            <div><strong>ID Number:</strong> <span id="teacher-profile-id"></span></div>
+                        </div>
+                    </div>
+                    <div class="dashboard-cards">
+                        <div class="card admin-only teacher-only">
+                            <h3>Students</h3>
+                            <p id="student-count">0</p>
+                        </div>
+                        <div class="card admin-only">
+                            <h3>Teachers</h3>
+                            <p id="teacher-count">0</p>
+                        </div>
+                        <div class="card admin-only teacher-only">
+                            <h3>Classes</h3>
+                            <p id="class-count">0</p>
+                        </div>
+                        <div class="card teacher-only">
+                            <h3>Attendance Today</h3>
+                            <p id="attendance-count">0%</p>
+                        </div>
+                        <div class="card student-only">
+                            <h3>My Average Grade</h3>
+                            <p id="student-grade-average">-</p>
+                        </div>
+                        <div class="card student-only">
+                            <h3>My Attendance</h3>
+                            <p id="student-attendance-percentage">-</p>
+                        </div>
+                    </div>
+                    
+                    <h2 class="admin-only teacher-only">Recent Activities</h2>
+                    <ul id="recent-activities" class="admin-only teacher-only">
+                        <li>System initialized</li>
+                    </ul>
+                    
+                    <div class="student-only">
+                        <h2>My Classes</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Teacher</th>
+                                    <th>Subjects</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-classes-table">
+                                <!-- Student classes will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Students Page -->
+                <div id="students-page" class="page hidden">
+                    <div class="page-header">
+                        <h1>Student Management</h1>
+                        <button id="add-student-btn" class="btn admin-only">Add New Student</button>
+                    </div>
+                    
+                    <div id="student-form-container" class="hidden mb-3">
+                        <h2>Add New Student</h2>
+                        <form id="student-form">
+                            <div class="form-group">
+                                <label for="student-first-name">First Name</label>
+                                <input type="text" id="student-first-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="student-last-name">Last Name</label>
+                                <input type="text" id="student-last-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="student-id-number">ID Number</label>
+                                <input type="text" id="student-id-number" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="student-grade">Grade</label>
+                                <select id="student-grade" required>
+                                    <option value="">Select Grade</option>
+                                    <option value="1">Grade 1</option>
+                                    <option value="2">Grade 2</option>
+                                    <option value="3">Grade 3</option>
+                                    <option value="4">Grade 4</option>
+                                    <option value="5">Grade 5</option>
+                                    <option value="6">Grade 6</option>
+                                    <option value="7">Grade 7</option>
+                                    <option value="8">Grade 8</option>
+                                    <option value="9">Grade 9</option>
+                                    <option value="10">Grade 10</option>
+                                    <option value="11">Grade 11</option>
+                                    <option value="12">Grade 12</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="student-parent-contact">Parent Contact</label>
+                                <input type="text" id="student-parent-contact" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="student-email">Email (for login)</label>
+                                <input type="email" id="student-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="student-password">Password</label>
+                                <input type="password" id="student-password" required>
+                            </div>
+                            <div class="form-group photo-upload">
+                                <label for="student-photo">Student Photo</label>
+                                <input type="file" id="student-photo" accept="image/*">
+                                <div id="student-photo-preview" class="photo-placeholder">No photo selected</div>
+                            </div>
+                            <button type="submit" class="btn btn-success">Save Student</button>
+                            <button type="button" id="cancel-student-btn" class="btn btn-danger">Cancel</button>
+                        </form>
+                    </div>
+                    
+                    <div id="students-list">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Photo</th>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>ID Number</th>
+                                    <th>Grade</th>
+                                    <th class="admin-only">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-table-body">
+                                <!-- Students will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Teachers Page -->
+                <div id="teachers-page" class="page hidden">
+                    <div class="page-header">
+                        <h1>Teacher Management</h1>
+                        <button id="add-teacher-btn" class="btn admin-only">Add New Teacher</button>
+                    </div>
+                    
+                    <div id="teacher-form-container" class="hidden mb-3">
+                        <h2>Add New Teacher</h2>
+                        <form id="teacher-form">
+                            <div class="form-group">
+                                <label for="teacher-first-name">First Name</label>
+                                <input type="text" id="teacher-first-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="teacher-last-name">Last Name</label>
+                                <input type="text" id="teacher-last-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="teacher-id-number">ID Number</label>
+                                <input type="text" id="teacher-id-number" required>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" id="toggle-teacher-subjects-btn" class="btn">Assign Subjects</button>
+                                <div id="teacher-subjects-wrapper" class="hidden" style="margin-top:.5rem;">
+                                    <label>Subjects (check all that apply)</label>
+                                    <div id="teacher-subjects-container" class="subjects-checkboxes" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.25rem;">
+                                        <!-- Each subject rendered as a checkbox so admin can assign multiple -->
+                                        <label><input type="checkbox" class="teacher-subject-checkbox" value="Math"> Math</label>
+                                        <label><input type="checkbox" class="teacher-subject-checkbox" value="English"> English</label>
+                                        <label><input type="checkbox" class="teacher-subject-checkbox" value="Science"> Science</label>
+                                        <label><input type="checkbox" class="teacher-subject-checkbox" value="Computer"> Computer</label>
+                                        <label><input type="checkbox" class="teacher-subject-checkbox" value="History"> History</label>
+                                        <label><input type="checkbox" class="teacher-subject-checkbox" value="Reading"> Reading</label>
+                                        <label><input type="checkbox" class="teacher-subject-checkbox" value="Spelling"> Spelling</label>
+                                        <label><input type="checkbox" class="teacher-subject-checkbox" value="Social Studies"> Social Studies</label>
+                                        <label><input type="checkbox" class="teacher-subject-checkbox" value="P.E."> P.E.</label>
+                                    </div>
+
+                                    <div class="form-group inline-add-subject" style="margin-top:.5rem;">
+                                        <label for="new-teacher-subject">Add a new subject</label>
+                                        <div style="display:flex; gap:8px; align-items:center;">
+                                            <input type="text" id="new-teacher-subject" placeholder="e.g. Art, Music" />
+                                            <button type="button" id="add-teacher-subject-btn" class="btn">Add</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="teacher-email">Email (for login)</label>
+                                <input type="email" id="teacher-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="teacher-password">Password</label>
+                                <input type="password" id="teacher-password" required>
+                            </div>
+                            <div class="form-group photo-upload">
+                                <label for="teacher-photo">Teacher Photo</label>
+                                <input type="file" id="teacher-photo" accept="image/*">
+                                <div id="teacher-photo-preview" class="photo-placeholder">No photo selected</div>
+                            </div>
+                            <button type="submit" class="btn btn-success">Save Teacher</button>
+                            <button type="button" id="cancel-teacher-btn" class="btn btn-danger">Cancel</button>
+                        </form>
+                    </div>
+                    
+                    <div id="teachers-list">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Photo</th>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>ID Number</th>
+                                    <th>Subject</th>
+                                    <th class="admin-only">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teachers-table-body">
+                                <!-- Teachers will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Classes Page -->
+                <div id="classes-page" class="page hidden">
+                    <div class="page-header">
+                        <h1>Class Management</h1>
+                        <button id="add-class-btn" class="btn admin-only">Add New Class</button>
+                    </div>
+                    
+                    <div id="class-form-container" class="hidden mb-3">
+                        <h2>Add New Class</h2>
+                        <form id="class-form">
+                            <div class="form-group">
+                                <label for="class-name">Class Name</label>
+                                <input type="text" id="class-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="class-grade">Grade (optional)</label>
+                                <select id="class-grade">
+                                    <option value="">Select Grade (optional)</option>
+                                    <option value="1">Grade 1</option>
+                                    <option value="2">Grade 2</option>
+                                    <option value="3">Grade 3</option>
+                                    <option value="4">Grade 4</option>
+                                    <option value="5">Grade 5</option>
+                                    <option value="6">Grade 6</option>
+                                    <option value="7">Grade 7</option>
+                                    <option value="8">Grade 8</option>
+                                    <option value="9">Grade 9</option>
+                                    <option value="10">Grade 10</option>
+                                    <option value="11">Grade 11</option>
+                                    <option value="12">Grade 12</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="class-teacher">Teacher</label>
+                                <select id="class-teacher" required>
+                                    <option value="">Select Teacher</option>
+                                    <!-- Teachers will be added here dynamically -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="class-students">Students</label>
+                                <select id="class-students" multiple>
+                                    <!-- Students will be added here dynamically -->
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success">Save Class</button>
+                            <button type="button" id="cancel-class-btn" class="btn btn-danger">Cancel</button>
+                        </form>
+                    </div>
+                    
+                    <div id="classes-list">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Class Name</th>
+                                    <th>Teacher</th>
+                                    <th>Students</th>
+                                    <th class="admin-only teacher-only">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="classes-table-body">
+                                <!-- Classes will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Attendance Page -->
+                <div id="attendance-page" class="page hidden">
+                    <h1>Attendance Management</h1>
+                    <div class="form-group">
+                        <label for="attendance-date">Date</label>
+                        <input type="date" id="attendance-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="attendance-class">Class</label>
+                        <select id="attendance-class">
+                            <option value="">Select Class</option>
+                            <!-- Classes will be added here dynamically -->
+                        </select>
+                    </div>
+                    <button id="load-attendance-btn" class="btn">Load Students</button>
+                    
+                    <div id="attendance-list" class="mt-3 hidden">
+                        <h2>Mark Attendance</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-table-body">
+                                <!-- Attendance will be added here dynamically -->
+                            </tbody>
+                        </table>
+                        <button id="save-attendance-btn" class="btn btn-success mt-2">Save Attendance</button>
+                    </div>
+                </div>
+
+                <!-- Grades Page -->
+                <div id="grades-page" class="page hidden">
+                    <h1>Grade Management</h1>
+                    <div class="form-group">
+                        <label for="grade-class">Class</label>
+                        <select id="grade-class">
+                            <option value="">Select Class</option>
+                            <!-- Classes will be added here dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="grade-subject">Subject</label>
+                        <select id="grade-subject">
+                            <option value="">Select Subject</option>
+                        </select>
+                    </div>
+                    <button id="load-grades-btn" class="btn">Load Students</button>
+                    
+                    <div id="grades-list" class="mt-3 hidden">
+                        <h2>Enter Grades</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>1st Period</th>
+                                    <th>2nd Period</th>
+                                    <th>3rd Period</th>
+                                    <th>1st Semester Exam</th>
+                                    <th>4th Period</th>
+                                    <th>5th Period</th>
+                                    <th>6th Period</th>
+                                    <th>Final Exam</th>
+                                </tr>
+                            </thead>
+                            <tbody id="grades-table-body">
+                                <!-- Grades will be added here dynamically -->
+                            </tbody>
+                        </table>
+                        <button id="save-grades-btn" class="btn btn-success mt-2">Save Grades</button>
+                    </div>
+                </div>
+
+                <!-- My Grades Page (Student) -->
+                <div id="my-grades-page" class="page hidden">
+                    <h1>My Grades</h1>
+                    <div class="form-group">
+                        <label for="student-grade-subject">Filter by Subject</label>
+                        <select id="student-grade-subject">
+                            <option value="">All Subjects</option>
+                            <!-- Subjects will be added here dynamically -->
+                        </select>
+                    </div>
+                    <button id="filter-grades-btn" class="btn">Filter</button>
+                    <!-- Full Grade Sheet -->
+                    <div class="mt-3">
+                        <h2>Full Grade Sheet</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>1st PD</th>
+                                    <th>2nd PD</th>
+                                    <th>3rd PD</th>
+                                    <th>1st Sem. Exam</th>
+                                    <th>1st Sem. Ave.</th>
+                                    <th>4th PD</th>
+                                    <th>5th PD</th>
+                                    <th>6th PD</th>
+                                    <th>2nd Sem. Exam</th>
+                                    <th>2nd Sem. Ave.</th>
+                                    <th>Yearly Ave.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-full-grade-sheet">
+                                <!-- Full grade sheet will be added here dynamically -->
+                            </tbody>
+                            <tfoot>
+                                <tr id="period-averages-row">
+                                    <td><strong>Period Average</strong></td>
+                                    <td id="avg-1"></td>
+                                    <td id="avg-2"></td>
+                                    <td id="avg-3"></td>
+                                    <td id="avg-1exam"></td>
+                                    <td id="avg-1sem"></td>
+                                    <td id="avg-4"></td>
+                                    <td id="avg-5"></td>
+                                    <td id="avg-6"></td>
+                                    <td id="avg-2exam"></td>
+                                    <td id="avg-2sem"></td>
+                                    <td id="avg-yearly"></td>
+                                </tr>
+                                <tr id="status-row">
+                                    <td><strong>Status</strong></td>
+                                    <td id="status-1"></td>
+                                    <td id="status-2"></td>
+                                    <td id="status-3"></td>
+                                    <td id="status-1exam"></td>
+                                    <td id="status-1sem"></td>
+                                    <td id="status-4"></td>
+                                    <td id="status-5"></td>
+                                    <td id="status-6"></td>
+                                    <td id="status-2exam"></td>
+                                    <td id="status-2sem"></td>
+                                    <td id="status-yearly"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <div class="mt-2"><strong>Total Yearly Average:</strong> <span id="student-total-yearly-average">-</span></div>
+                    </div>
+                </div>
+
+                <!-- My Attendance Page (Student) -->
+                <div id="my-attendance-page" class="page hidden">
+                    <h1>My Attendance</h1>
+                    <div class="form-group">
+                        <label for="student-attendance-class">Filter by Class</label>
+                        <select id="student-attendance-class">
+                            <option value="">All Classes</option>
+                            <!-- Classes will be added here dynamically -->
+                        </select>
+                    </div>
+                    <button id="filter-attendance-btn" class="btn">Filter</button>
+                    
+                    <div class="mt-3">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-attendance-table">
+                                <!-- Student attendance will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script>
+        npm install @supabase/supabase-js
+        // Supabase configuration (replace these placeholders with your project values)
+        const SUPABASE_URL = 'https://zvmftgptxrpkgvvmivtr.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_Xh6q2He9p_DM2rl-u5rkow_-PMH18Bn';
+        const SUPABASE_SECRET_KEY = 'sb_secret_mHMX5yYU2uLskmsmM4Zbyg_eBtcM1Sh';
+        // The Edge Function you deploy for admin-created users (see README_SUPABASE.md)
+        const SUPABASE_EDGE_CREATE_USER_URL = 'REPLACE_WITH_EDGE_FUNCTION_URL';
+
+        let supabaseClient = null;
+        try {
+            if (!SUPABASE_URL.includes('REPLACE') && !SUPABASE_ANON_KEY.includes('REPLACE')) {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.info('Supabase client initialized');
+            } else {
+                console.info('Supabase not configured — running in local mode');
+            }
+        } catch (e) {
+            console.warn('Supabase init error', e);
+        }
+
+        async function supabaseSignIn(email, password) {
+            if (!supabaseClient) throw new Error('Supabase not configured');
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            return data;
+        }
+
+        async function supabaseSignOut() {
+            if (!supabaseClient) return;
+            await supabaseClient.auth.signOut();
+        }
+
+        async function adminCreateAuthUser(payload) {
+            if (!SUPABASE_EDGE_CREATE_USER_URL || SUPABASE_EDGE_CREATE_USER_URL.includes('REPLACE')) {
+                throw new Error('Edge function URL not configured');
+            }
+            const res = await fetch(SUPABASE_EDGE_CREATE_USER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`Edge function failed: ${text}`);
+            }
+            return res.json();
+        }
+
+        async function uploadPhotoToStorage(file, destPath) {
+            if (!supabaseClient) throw new Error('Supabase not configured');
+            const { data, error } = await supabaseClient.storage.from('photos').upload(destPath, file, { upsert: true });
+            if (error) throw error;
+            const url = supabaseClient.storage.from('photos').getPublicUrl(destPath).data.publicUrl;
+            return url;
+        }
+
+        // Data Storage (Simulating a database)
+        let users = [
+            { id: 1, username: 'admin', email: 'admin@school.com', password: 'admin123', role: 'admin' }
+        ];
+        
+        let students = [
+            { 
+                id: 1, 
+                firstName: 'John', 
+                lastName: 'Doe', 
+                idNumber: 'ST001',
+                grade: '5', 
+                parentContact: 'john.doe@email.com', 
+                userId: null,
+                photo: null
+            },
+            { 
+                id: 2, 
+                firstName: 'Jane', 
+                lastName: 'Smith', 
+                idNumber: 'ST002',
+                grade: '7', 
+                parentContact: 'jane.smith@email.com', 
+                userId: null,
+                photo: null
+            },
+            // Demo student with full grades
+            {
+                id: 3,
+                firstName: 'Anthony',
+                lastName: 'Brooks Jr.',
+                idNumber: 'ST003',
+                grade: '3',
+                parentContact: 'anthony.brooks@email.com',
+                userId: null,
+                photo: null
+            }
+        ];
+        
+        let teachers = [
+            { 
+                id: 1, 
+                firstName: 'Robert', 
+                lastName: 'Johnson', 
+                idNumber: 'TC001',
+                subject: 'Mathematics',
+                subjects: ['Mathematics'],
+                userId: null,
+                photo: null
+            },
+            { 
+                id: 2, 
+                firstName: 'Emily', 
+                lastName: 'Williams', 
+                idNumber: 'TC002',
+                subject: 'Science',
+                subjects: ['Science'],
+                userId: null,
+                photo: null
+            }
+        ];
+        
+        let classes = [
+            { 
+                id: 1, 
+                name: '5A', 
+                teacherId: 1, 
+                studentIds: [1, 3] 
+            },
+            { 
+                id: 2, 
+                name: '7B', 
+                teacherId: 2, 
+                studentIds: [2] 
+            }
+        ];
+        
+        let attendance = [];
+        let grades = [
+            // Demo grades for Anthony Brooks Jr. (id: 3)
+            // Math
+            {studentId:3, classId:1, subject:'Math', grade:80, period:'1st period', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'Math', grade:70, period:'2nd period', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'Math', grade:60, period:'3rd period', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'Math', grade:75, period:'1st semester exam', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'Math', grade:70, period:'4th period', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'Math', grade:72, period:'5th period', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'Math', grade:80, period:'6th period', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'Math', grade:70, period:'final exam', date:'2025-09-01'},
+            // English
+            {studentId:3, classId:1, subject:'English', grade:76, period:'1st period', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'English', grade:80, period:'2nd period', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'English', grade:99, period:'3rd period', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'English', grade:75, period:'1st semester exam', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'English', grade:90, period:'4th period', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'English', grade:70, period:'5th period', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'English', grade:80, period:'6th period', date:'2025-09-01'},
+            {studentId:3, classId:1, subject:'English', grade:70, period:'final exam', date:'2025-09-01'},
+            // Add more subjects as needed for demo
+        ];
+        
+        // Current User
+        let currentUser = null;
+        let currentStudent = null;
+        let currentTeacher = null;
+        
+        // DOM Elements
+        const loginPage = document.getElementById('login-page');
+        const registerPage = document.getElementById('register-page');
+        const app = document.getElementById('app');
+        
+        // Login/Register Elements
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const showRegister = document.getElementById('show-register');
+        const showLogin = document.getElementById('show-login');
+        const loginAlert = document.getElementById('login-alert');
+        const registerAlert = document.getElementById('register-alert');
+        
+        // Navigation Elements
+        const logoutBtn = document.getElementById('logout');
+        const navLinks = document.querySelectorAll('[data-page]');
+        
+        // Page Elements
+        const pages = document.querySelectorAll('.page');
+        
+        // Dashboard Elements
+        const studentCount = document.getElementById('student-count');
+        const teacherCount = document.getElementById('teacher-count');
+        const classCount = document.getElementById('class-count');
+        const attendanceCount = document.getElementById('attendance-count');
+        const recentActivities = document.getElementById('recent-activities');
+        const studentGradeAverage = document.getElementById('student-grade-average');
+        const studentAttendancePercentage = document.getElementById('student-attendance-percentage');
+        const studentClassesTable = document.getElementById('student-classes-table');
+        
+        // Students Elements
+        const addStudentBtn = document.getElementById('add-student-btn');
+        const studentFormContainer = document.getElementById('student-form-container');
+        const studentForm = document.getElementById('student-form');
+        const cancelStudentBtn = document.getElementById('cancel-student-btn');
+        const studentsTableBody = document.getElementById('students-table-body');
+        
+        // Teachers Elements
+        const addTeacherBtn = document.getElementById('add-teacher-btn');
+        const teacherFormContainer = document.getElementById('teacher-form-container');
+        const teacherForm = document.getElementById('teacher-form');
+        const cancelTeacherBtn = document.getElementById('cancel-teacher-btn');
+        const teachersTableBody = document.getElementById('teachers-table-body');
+        
+        // Classes Elements
+        const addClassBtn = document.getElementById('add-class-btn');
+        const classFormContainer = document.getElementById('class-form-container');
+        const classForm = document.getElementById('class-form');
+        const cancelClassBtn = document.getElementById('cancel-class-btn');
+        const classesTableBody = document.getElementById('classes-table-body');
+        const classTeacherSelect = document.getElementById('class-teacher');
+        const classStudentsSelect = document.getElementById('class-students');
+    const classGradeSelect = document.getElementById('class-grade');
+        
+        // Attendance Elements
+        const attendanceClassSelect = document.getElementById('attendance-class');
+        const loadAttendanceBtn = document.getElementById('load-attendance-btn');
+        const attendanceList = document.getElementById('attendance-list');
+        const attendanceTableBody = document.getElementById('attendance-table-body');
+        const saveAttendanceBtn = document.getElementById('save-attendance-btn');
+        
+        // Grades Elements
+        const gradeClassSelect = document.getElementById('grade-class');
+        const loadGradesBtn = document.getElementById('load-grades-btn');
+        const gradesList = document.getElementById('grades-list');
+        const gradesTableBody = document.getElementById('grades-table-body');
+        const saveGradesBtn = document.getElementById('save-grades-btn');
+        
+        // Student Grades Elements
+        const studentGradeSubject = document.getElementById('student-grade-subject');
+        const filterGradesBtn = document.getElementById('filter-grades-btn');
+        const studentGradesTable = document.getElementById('student-grades-table');
+        
+        // Student Attendance Elements
+        const studentAttendanceClass = document.getElementById('student-attendance-class');
+        const filterAttendanceBtn = document.getElementById('filter-attendance-btn');
+        const studentAttendanceTable = document.getElementById('student-attendance-table');
+        
+        // Photo handling functions
+        function handlePhotoUpload(inputElement, previewElement) {
+            const file = inputElement.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'photo-preview';
+                    previewElement.innerHTML = '';
+                    previewElement.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+                return file;
+            }
+            return null;
+        }
+
+        // Small helpers
+        const PASS_THRESHOLD = 70; // centralize pass/fail threshold
+
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Persistence helpers (localStorage)
+        const STORAGE_KEY = 'sfs_data_v1';
+
+        function saveData() {
+            try {
+                const payload = { users, students, teachers, classes, grades, attendance };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+            } catch (e) {
+                console.warn('Failed to save data to localStorage', e);
+            }
+        }
+
+        function loadData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const obj = JSON.parse(raw);
+                if (obj.users) users = obj.users;
+                if (obj.students) students = obj.students;
+                if (obj.teachers) teachers = obj.teachers;
+                if (obj.classes) classes = obj.classes;
+                if (obj.grades) grades = obj.grades;
+                if (obj.attendance) attendance = obj.attendance;
+            } catch (e) {
+                console.warn('Failed to load data from localStorage', e);
+            }
+        }
+
+        // If Supabase is configured, load canonical data from the remote DB into the app
+        async function loadFromSupabase() {
+            if (!supabaseClient) return;
+            try {
+                // Load students
+                const { data: srows, error: sErr } = await supabaseClient.from('students').select('*');
+                if (!sErr && Array.isArray(srows)) {
+                    students = srows.map(r => ({
+                        id: r.id,
+                        firstName: r.first_name || r.firstName || '',
+                        lastName: r.last_name || r.lastName || '',
+                        idNumber: r.id_number || r.idNumber || '',
+                        grade: r.grade || r.grade_level || '',
+                        parentContact: r.parent_contact || r.parentContact || '',
+                        userId: r.user_id || r.userId || null,
+                        photo: r.photo_url || r.photo || null
+                    }));
+                }
+
+                // Load teachers
+                const { data: trows, error: tErr } = await supabaseClient.from('teachers').select('*');
+                if (!tErr && Array.isArray(trows)) {
+                    teachers = trows.map(r => ({
+                        id: r.id,
+                        firstName: r.first_name || r.firstName || '',
+                        lastName: r.last_name || r.lastName || '',
+                        idNumber: r.id_number || r.idNumber || '',
+                        subjects: Array.isArray(r.subjects) ? r.subjects : (r.subject ? [r.subject] : []),
+                        userId: r.user_id || r.userId || null,
+                        photo: r.photo_url || r.photo || null
+                    }));
+                }
+
+                // Load classes
+                const { data: crows, error: cErr } = await supabaseClient.from('classes').select('*');
+                if (!cErr && Array.isArray(crows)) {
+                    classes = crows.map(r => ({
+                        id: r.id,
+                        name: r.name,
+                        teacherId: r.teacher_id || r.teacherId || null,
+                        studentIds: Array.isArray(r.student_ids) ? r.student_ids.map(v => parseInt(v)) : (Array.isArray(r.studentIds) ? r.studentIds : [])
+                    }));
+                }
+
+                // Load grades
+                const { data: grows, error: gErr } = await supabaseClient.from('grades').select('*');
+                if (!gErr && Array.isArray(grows)) {
+                    grades = grows.map(r => ({
+                        studentId: r.student_id || r.studentId,
+                        classId: r.class_id || r.classId,
+                        subject: r.subject,
+                        grade: r.grade,
+                        period: r.period,
+                        date: r.date
+                    }));
+                }
+
+                // Load attendance
+                const { data: arows, error: aErr } = await supabaseClient.from('attendance').select('*');
+                if (!aErr && Array.isArray(arows)) {
+                    attendance = arows.map(r => ({
+                        classId: r.class_id || r.classId,
+                        date: r.date,
+                        records: r.records || r.records_json || []
+                    }));
+                }
+
+                // Persist fetched data locally for offline use
+                saveData();
+                console.info('Loaded data from Supabase');
+            } catch (err) {
+                console.warn('Failed to load from Supabase', err);
+            }
+        }
+
+        // Sync students to Supabase
+        async function syncStudentsToSupabase() {
+            if (!supabaseClient) return;
+            try {
+                for (const student of students) {
+                    // Prepare record for database
+                    const dbRecord = {
+                        first_name: student.firstName || '',
+                        last_name: student.lastName || '',
+                        student_id: student.idNumber || '',
+                        email: student.parentContact || '',
+                        enrollment_date: new Date().toISOString().split('T')[0]
+                    };
+
+                    if (student.id) {
+                        // Update existing
+                        await supabaseClient.from('students').update(dbRecord).eq('id', student.id).catch(e => console.warn('Could not sync student', student.id, e));
+                    } else {
+                        // Insert new
+                        await supabaseClient.from('students').insert([dbRecord]).catch(e => console.warn('Could not create student', e));
+                    }
+                }
+                console.info('Synced students to Supabase');
+            } catch (err) {
+                console.warn('Failed to sync students to Supabase', err);
+            }
+        }
+
+        // Sync teachers to Supabase
+        async function syncTeachersToSupabase() {
+            if (!supabaseClient) return;
+            try {
+                for (const teacher of teachers) {
+                    const dbRecord = {
+                        first_name: teacher.firstName || '',
+                        last_name: teacher.lastName || '',
+                        id_number: teacher.idNumber || '',
+                        email: teacher.email || '',
+                        subjects: Array.isArray(teacher.subjects) ? teacher.subjects : (teacher.subject ? [teacher.subject] : []),
+                        hire_date: new Date().toISOString().split('T')[0]
+                    };
+
+                    if (teacher.id) {
+                        await supabaseClient.from('teachers').update(dbRecord).eq('id', teacher.id).catch(e => console.warn('Could not sync teacher', teacher.id, e));
+                    } else {
+                        await supabaseClient.from('teachers').insert([dbRecord]).catch(e => console.warn('Could not create teacher', e));
+                    }
+                }
+                console.info('Synced teachers to Supabase');
+            } catch (err) {
+                console.warn('Failed to sync teachers to Supabase', err);
+            }
+        }
+
+        // Sync grades to Supabase
+        async function syncGradesToSupabase() {
+            if (!supabaseClient) return;
+            try {
+                for (const gradeRecord of grades) {
+                    const dbRecord = {
+                        student_id: gradeRecord.studentId,
+                        class_id: gradeRecord.classId,
+                        subject: gradeRecord.subject,
+                        grade: gradeRecord.grade,
+                        period: gradeRecord.period,
+                        date: gradeRecord.date
+                    };
+
+                    // Upsert based on unique combination
+                    await supabaseClient.from('grades').upsert([dbRecord]).catch(e => console.warn('Could not sync grade', e));
+                }
+                console.info('Synced grades to Supabase');
+            } catch (err) {
+                console.warn('Failed to sync grades to Supabase', err);
+            }
+        }
+
+        // Sync attendance to Supabase
+        async function syncAttendanceToSupabase() {
+            if (!supabaseClient) return;
+            try {
+                for (const attendanceRecord of attendance) {
+                    if (Array.isArray(attendanceRecord.records)) {
+                        for (const record of attendanceRecord.records) {
+                            const dbRecord = {
+                                student_id: record.studentId,
+                                class_id: attendanceRecord.classId,
+                                attendance_date: attendanceRecord.date,
+                                status: record.status,
+                                notes: record.notes || ''
+                            };
+                            await supabaseClient.from('attendance').upsert([dbRecord]).catch(e => console.warn('Could not sync attendance', e));
+                        }
+                    }
+                }
+                console.info('Synced attendance to Supabase');
+            } catch (err) {
+                console.warn('Failed to sync attendance to Supabase', err);
+            }
+        }
+
+        // Format grade value as HTML with color class
+        function formatGradeHTML(val) {
+            if (val === null || val === undefined) return '';
+            if (val === '-' || val === '') return '';
+            // ensure value is a string representing a number when possible
+            const num = parseFloat(val);
+            if (isNaN(num)) return String(val);
+            const cls = num >= PASS_THRESHOLD ? 'grade-pass' : 'grade-fail';
+            // keep one decimal if it has decimal, otherwise show integer
+            const display = (Math.round(num) !== num) ? num : num;
+            return `<span class="${cls}">${display}</span>`;
+        }
+
+        // Helper Functions
+        function showAlert(element, message, type = 'danger') {
+            element.textContent = message;
+            element.classList.remove('hidden');
+            element.className = `alert alert-${type}`;
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 3000);
+        }
+        
+        function navigateTo(page) {
+            pages.forEach(p => p.classList.add('hidden'));
+            document.getElementById(`${page}-page`).classList.remove('hidden');
+            
+            // Update active link in sidebar
+            document.querySelectorAll('.sidebar a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-page') === page) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Load data for the page
+            switch(page) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'students':
+                    loadStudents();
+                    break;
+                case 'teachers':
+                    loadTeachers();
+                    break;
+                case 'classes':
+                    loadClasses();
+                    break;
+                case 'attendance':
+                    loadAttendanceForm();
+                    break;
+                case 'grades':
+                    loadGradesForm();
+                    break;
+                case 'my-grades':
+                    loadStudentGrades();
+                    break;
+                case 'my-attendance':
+                    loadStudentAttendance();
+                    break;
+            }
+        }
+        
+        function loadDashboard() {
+            if (currentUser.role === 'admin' || currentUser.role === 'teacher') {
+                studentCount.textContent = students.length;
+                teacherCount.textContent = teachers.length;
+                classCount.textContent = classes.length;
+                
+                // Show teacher profile info if teacher
+                if (currentUser.role === 'teacher' && currentTeacher) {
+                    document.getElementById('teacher-profile-info').style.display = 'flex';
+                    // Photo
+                    const photoDiv = document.getElementById('teacher-profile-photo');
+                    photoDiv.innerHTML = '';
+                    if (currentTeacher.photo) {
+                        const img = document.createElement('img');
+                        img.src = currentTeacher.photo;
+                        img.className = 'photo-preview';
+                        photoDiv.appendChild(img);
+                    } else {
+                        photoDiv.innerHTML = '<div class="photo-placeholder">No photo</div>';
+                    }
+                    // Name and ID
+                    document.getElementById('teacher-profile-name').textContent = `${currentTeacher.firstName} ${currentTeacher.lastName}`;
+                    document.getElementById('teacher-profile-id').textContent = currentTeacher.idNumber;
+                } else {
+                    document.getElementById('teacher-profile-info').style.display = 'none';
+                }
+                // Hide student profile info
+                document.getElementById('student-profile-info').style.display = 'none';
+                // Simple attendance percentage calculation
+                if (attendance.length > 0) {
+                    const today = new Date().toISOString().split('T')[0];
+                    const todayAttendance = attendance.filter(a => a.date === today);
+                    if (todayAttendance.length > 0) {
+                        const presentCount = todayAttendance[0].records.filter(r => r.present).length;
+                        const percentage = Math.round((presentCount / todayAttendance[0].records.length) * 100);
+                        attendanceCount.textContent = `${percentage}%`;
+                    }
+                }
+                // Recent activities
+                recentActivities.innerHTML = '';
+                const li1 = document.createElement('li'); li1.textContent = `${students.length} students registered`; recentActivities.appendChild(li1);
+                const li2 = document.createElement('li'); li2.textContent = `${teachers.length} teachers registered`; recentActivities.appendChild(li2);
+                const li3 = document.createElement('li'); li3.textContent = `${classes.length} classes created`; recentActivities.appendChild(li3);
+            } else if (currentUser.role === 'student') {
+                // Show student profile info
+                if (currentStudent) {
+                    document.getElementById('student-profile-info').style.display = 'flex';
+                    // Photo
+                    const photoDiv = document.getElementById('student-profile-photo');
+                    photoDiv.innerHTML = '';
+                    if (currentStudent.photo) {
+                        const img = document.createElement('img');
+                        img.src = currentStudent.photo;
+                        img.className = 'photo-preview';
+                        photoDiv.appendChild(img);
+                    } else {
+                        photoDiv.innerHTML = '<div class="photo-placeholder">No photo</div>';
+                    }
+                    // Name and ID
+                    document.getElementById('student-profile-name').textContent = `${currentStudent.firstName} ${currentStudent.lastName}`;
+                    document.getElementById('student-profile-id').textContent = currentStudent.idNumber;
+                }
+                // Hide teacher profile info
+                document.getElementById('teacher-profile-info').style.display = 'none';
+                // Calculate average grade
+                const studentGrades = grades.filter(g => g.studentId === currentStudent.id);
+                if (studentGrades.length > 0) {
+                    const sum = studentGrades.reduce((total, grade) => {
+                        return total + parseFloat(grade.grade);
+                    }, 0);
+                    const average = (sum / studentGrades.length).toFixed(1);
+                    studentGradeAverage.innerHTML = formatGradeHTML(average);
+                } else {
+                    studentGradeAverage.textContent = '-';
+                }
+                // Calculate attendance percentage
+                const studentAttendanceRecords = [];
+                attendance.forEach(a => {
+                    const record = a.records.find(r => r.studentId === currentStudent.id);
+                    if (record) {
+                        studentAttendanceRecords.push(record.present);
+                    }
+                });
+                if (studentAttendanceRecords.length > 0) {
+                    const presentCount = studentAttendanceRecords.filter(p => p).length;
+                    const percentage = Math.round((presentCount / studentAttendanceRecords.length) * 100);
+                    studentAttendancePercentage.textContent = `${percentage}%`;
+                } else {
+                    studentAttendancePercentage.textContent = '-';
+                }
+                // Load student classes
+                studentClassesTable.innerHTML = '';
+                const studentClasses = classes.filter(c => c.studentIds.includes(currentStudent.id));
+                studentClasses.forEach(cls => {
+                    const teacher = teachers.find(t => t.id === cls.teacherId);
+                    const teacherName = teacher ? `${teacher.firstName} ${teacher.lastName}` : 'N/A';
+                    const subjects = teacher ? ((teacher.subjects && teacher.subjects.length) ? teacher.subjects.join(', ') : (teacher.subject || '')) : '';
+                        const row = document.createElement('tr');
+                        const tdName = document.createElement('td'); tdName.textContent = cls.name; row.appendChild(tdName);
+                        const tdTeacher = document.createElement('td'); tdTeacher.textContent = teacherName; row.appendChild(tdTeacher);
+                        const tdSubjects = document.createElement('td'); tdSubjects.textContent = subjects; row.appendChild(tdSubjects);
+                        studentClassesTable.appendChild(row);
+                });
+                // Render the student's full grade sheet on dashboard as well
+                renderFullGradeSheet();
+            }
+        }
+        
+        function loadStudents() {
+            studentsTableBody.innerHTML = '';
+            // If a teacher is logged in, show only students assigned to that teacher's classes
+            let studentsToShow = students;
+            if (currentUser && currentUser.role === 'teacher' && currentTeacher) {
+                const teacherClasses = classes.filter(c => c.teacherId === currentTeacher.id);
+                const studentIdSet = new Set();
+                teacherClasses.forEach(c => (c.studentIds || []).forEach(id => studentIdSet.add(id)));
+                studentsToShow = students.filter(s => studentIdSet.has(s.id));
+            }
+
+            studentsToShow.forEach(student => {
+                const row = document.createElement('tr');
+                
+                // Photo cell
+                const photoCell = document.createElement('td');
+                photoCell.className = 'photo-cell';
+                if (student.photo) {
+                    const img = document.createElement('img');
+                    img.src = student.photo;
+                    photoCell.appendChild(img);
+                } else {
+                    photoCell.textContent = 'No photo';
+                }
+                
+                row.appendChild(photoCell);
+                const tdId = document.createElement('td'); tdId.textContent = student.id; row.appendChild(tdId);
+                const tdName = document.createElement('td'); tdName.textContent = `${student.firstName} ${student.lastName}`; row.appendChild(tdName);
+                const tdIdNum = document.createElement('td'); tdIdNum.className = 'id-number'; tdIdNum.textContent = student.idNumber; row.appendChild(tdIdNum);
+                const tdGrade = document.createElement('td'); tdGrade.textContent = `Grade ${student.grade}`; row.appendChild(tdGrade);
+                const tdActions = document.createElement('td'); tdActions.className = 'admin-only';
+                const editBtn = document.createElement('button'); editBtn.className = 'btn'; editBtn.textContent = 'Edit'; editBtn.onclick = () => editStudent(student.id);
+                const delBtn = document.createElement('button'); delBtn.className = 'btn btn-danger'; delBtn.textContent = 'Delete'; delBtn.onclick = () => deleteStudent(student.id);
+                tdActions.appendChild(editBtn); tdActions.appendChild(delBtn); row.appendChild(tdActions);
+                studentsTableBody.appendChild(row);
+            });
+        }
+        
+        function loadTeachers() {
+            teachersTableBody.innerHTML = '';
+            teachers.forEach(teacher => {
+                const row = document.createElement('tr');
+                
+                // Photo cell
+                const photoCell = document.createElement('td');
+                photoCell.className = 'photo-cell';
+                if (teacher.photo) {
+                    const img = document.createElement('img');
+                    img.src = teacher.photo;
+                    photoCell.appendChild(img);
+                } else {
+                    photoCell.textContent = 'No photo';
+                }
+                
+                row.appendChild(photoCell);
+                const tdIdT = document.createElement('td'); tdIdT.textContent = teacher.id; row.appendChild(tdIdT);
+                const tdNameT = document.createElement('td'); tdNameT.textContent = `${teacher.firstName} ${teacher.lastName}`; row.appendChild(tdNameT);
+                const tdIdNumT = document.createElement('td'); tdIdNumT.className = 'id-number'; tdIdNumT.textContent = teacher.idNumber; row.appendChild(tdIdNumT);
+                const tdSubj = document.createElement('td'); tdSubj.textContent = (teacher.subjects && teacher.subjects.length) ? teacher.subjects.join(', ') : (teacher.subject || ''); row.appendChild(tdSubj);
+                const tdActionsT = document.createElement('td'); tdActionsT.className = 'admin-only';
+                const editBtnT = document.createElement('button'); editBtnT.className = 'btn'; editBtnT.textContent = 'Edit'; editBtnT.onclick = () => editTeacher(teacher.id);
+                const delBtnT = document.createElement('button'); delBtnT.className = 'btn btn-danger'; delBtnT.textContent = 'Delete'; delBtnT.onclick = () => deleteTeacher(teacher.id);
+                tdActionsT.appendChild(editBtnT); tdActionsT.appendChild(delBtnT); row.appendChild(tdActionsT);
+                teachersTableBody.appendChild(row);
+            });
+        }
+        
+        function loadClasses() {
+            classesTableBody.innerHTML = '';
+            classTeacherSelect.innerHTML = '<option value="">Select Teacher</option>';
+            classStudentsSelect.innerHTML = '';
+            // Populate class-grade select (keep current selection if any)
+            if (classGradeSelect) {
+                // leave options as they are in HTML; do not overwrite
+            }
+            
+            // Populate teacher dropdown
+            teachers.forEach(teacher => {
+                const option = document.createElement('option');
+                option.value = teacher.id;
+                option.textContent = `${teacher.firstName} ${teacher.lastName}`;
+                classTeacherSelect.appendChild(option);
+            });
+            
+            // Populate students multiselect
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = `${student.firstName} ${student.lastName} (Grade ${student.grade})`;
+                classStudentsSelect.appendChild(option);
+            });
+
+            // grade-change listener is attached once during initialization
+            
+            // Display classes table
+                // If teacher is logged in, show only their classes
+                let classesToShow = classes;
+                if (currentUser.role === 'teacher' && currentTeacher) {
+                    classesToShow = classes.filter(c => c.teacherId === currentTeacher.id);
+                }
+                classesToShow.forEach(cls => {
+                const teacher = teachers.find(t => t.id === cls.teacherId);
+                const classStudents = students.filter(s => cls.studentIds.includes(s.id));
+                const studentNames = classStudents.map(s => `${s.firstName} ${s.lastName}`).join(', ');
+                
+                const row = document.createElement('tr');
+                const tdId = document.createElement('td'); tdId.textContent = cls.id; row.appendChild(tdId);
+                const tdName = document.createElement('td'); tdName.textContent = cls.name; row.appendChild(tdName);
+                const tdTeacher = document.createElement('td'); tdTeacher.textContent = teacher ? `${teacher.firstName} ${teacher.lastName}` : 'N/A'; row.appendChild(tdTeacher);
+                const tdStudents = document.createElement('td'); tdStudents.textContent = studentNames || 'No students'; row.appendChild(tdStudents);
+                const tdActions = document.createElement('td'); tdActions.className = 'admin-only';
+                const editBtn = document.createElement('button'); editBtn.className = 'btn'; editBtn.textContent = 'Edit'; editBtn.addEventListener('click', () => editClass(cls.id));
+                const delBtn = document.createElement('button'); delBtn.className = 'btn btn-danger'; delBtn.textContent = 'Delete'; delBtn.addEventListener('click', () => deleteClass(cls.id));
+                tdActions.appendChild(editBtn); tdActions.appendChild(delBtn); row.appendChild(tdActions);
+                classesTableBody.appendChild(row);
+            });
+        }
+        
+        function loadAttendanceForm() {
+            attendanceClassSelect.innerHTML = '<option value="">Select Class</option>';
+            
+            // Teachers can only see their own classes
+            if (currentUser.role === 'teacher') {
+                const teacherClasses = classes.filter(c => c.teacherId === currentTeacher.id);
+                teacherClasses.forEach(cls => {
+                    const option = document.createElement('option');
+                    option.value = cls.id;
+                    option.textContent = cls.name;
+                    attendanceClassSelect.appendChild(option);
+                });
+            } else if (currentUser.role === 'admin') {
+                // Admins can see all classes
+                classes.forEach(cls => {
+                    const option = document.createElement('option');
+                    option.value = cls.id;
+                    option.textContent = cls.name;
+                    attendanceClassSelect.appendChild(option);
+                });
+            }
+        }
+        
+        function loadGradesForm() {
+            gradeClassSelect.innerHTML = '<option value="">Select Class</option>';
+            // Teachers can only see their own classes
+            if (currentUser.role === 'teacher') {
+                const teacherClasses = classes.filter(c => c.teacherId === currentTeacher.id);
+                teacherClasses.forEach(cls => {
+                    const option = document.createElement('option');
+                    option.value = cls.id;
+                    option.textContent = cls.name;
+                    gradeClassSelect.appendChild(option);
+                });
+                // Populate subjects dropdown with teacher's assigned subjects
+                const gradeSubjectSelect = document.getElementById('grade-subject');
+                gradeSubjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                if (currentTeacher && currentTeacher.subjects && currentTeacher.subjects.length) {
+                    currentTeacher.subjects.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s;
+                        opt.textContent = s;
+                        gradeSubjectSelect.appendChild(opt);
+                    });
+                }
+            } else if (currentUser.role === 'admin') {
+                // Admins can see all classes
+                classes.forEach(cls => {
+                    const option = document.createElement('option');
+                    option.value = cls.id;
+                    option.textContent = cls.name;
+                    gradeClassSelect.appendChild(option);
+                });
+                // Admin can choose any subject (collect subjects from teachers list)
+                const gradeSubjectSelect = document.getElementById('grade-subject');
+                gradeSubjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                const allSubjects = new Set();
+                teachers.forEach(t => {
+                    if (t.subjects && Array.isArray(t.subjects)) t.subjects.forEach(s => allSubjects.add(s));
+                    else if (t.subject) allSubjects.add(t.subject);
+                });
+                Array.from(allSubjects).forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s;
+                    opt.textContent = s;
+                    gradeSubjectSelect.appendChild(opt);
+                });
+            }
+        }
+
+        // Populate the class students multiselect based on selected grade
+        function populateStudentsByGrade(grade) {
+            classStudentsSelect.innerHTML = '';
+            let filtered = students;
+            if (grade) {
+                filtered = students.filter(s => String(s.grade) === String(grade));
+            }
+            filtered.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = `${student.firstName} ${student.lastName} (Grade ${student.grade})`;
+                classStudentsSelect.appendChild(option);
+            });
+        }
+        
+        function loadStudentGrades() {
+            studentGradeSubject.innerHTML = '<option value="">All Subjects</option>';
+            // Get unique subjects for this student
+            const studentGrades = grades.filter(g => g.studentId === currentStudent.id);
+            const subjects = [...new Set(studentGrades.map(g => g.subject))];
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                studentGradeSubject.appendChild(option);
+            });
+            // Display all grades by default
+            filterStudentGrades();
+            // Render full grade sheet
+            renderFullGradeSheet();
+        }
+
+        // Render a full grade sheet for the student
+        function renderFullGradeSheet() {
+            const fullSheetBody = document.getElementById('student-full-grade-sheet');
+            const totalYearlyAverageSpan = document.getElementById('student-total-yearly-average');
+            if (!fullSheetBody) return;
+            fullSheetBody.innerHTML = '';
+            // Get all grades for this student
+            const studentGrades = grades.filter(g => g.studentId === currentStudent.id);
+            // Group by subject only (not class)
+            const grouped = {};
+            studentGrades.forEach(g => {
+                if (!grouped[g.subject]) grouped[g.subject] = [];
+                grouped[g.subject].push(g);
+            });
+            // For period averages and status
+            const periodKeys = [
+                '1st period','2nd period','3rd period','1st semester exam',
+                '4th period','5th period','6th period','final exam'
+            ];
+            const periodCells = ['avg-1','avg-2','avg-3','avg-1exam','avg-4','avg-5','avg-6','avg-2exam'];
+            const statusCells = ['status-1','status-2','status-3','status-1exam','status-4','status-5','status-6','status-2exam'];
+            let periodTotals = Array(8).fill(0);
+            let periodCounts = Array(8).fill(0);
+            let sem1Averages = [], sem2Averages = [], yearlyAverages = [];
+            let sem1Statuses = [], sem2Statuses = [], yearlyStatuses = [];
+            Object.keys(grouped).forEach(subject => {
+                // Map period types to grade values
+                const periodMap = {
+                    '1st period': '',
+                    '2nd period': '',
+                    '3rd period': '',
+                    '1st semester exam': '',
+                    '4th period': '',
+                    '5th period': '',
+                    '6th period': '',
+                    'final exam': ''
+                };
+                grouped[subject].forEach(g => {
+                    let period = (g.period || '').toLowerCase();
+                    if (!period) {
+                        const subj = (g.subject || '').toLowerCase();
+                        if (subj.includes('1st period')) period = '1st period';
+                        else if (subj.includes('2nd period')) period = '2nd period';
+                        else if (subj.includes('3rd period')) period = '3rd period';
+                        else if (subj.includes('1st semester exam')) period = '1st semester exam';
+                        else if (subj.includes('4th period')) period = '4th period';
+                        else if (subj.includes('5th period')) period = '5th period';
+                        else if (subj.includes('6th period')) period = '6th period';
+                        else if (subj.includes('final exam')) period = 'final exam';
+                    }
+                    if (periodMap.hasOwnProperty(period)) {
+                        periodMap[period] = g.grade;
+                    }
+                });
+                // Calculate averages
+                let firstSemGrades = ['1st period','2nd period','3rd period','1st semester exam'].map(p => parseFloat(periodMap[p]) || null);
+                let firstSemValid = firstSemGrades.filter(v => v !== null);
+                let firstSemAvg = firstSemValid.length === 4 ? (firstSemGrades.reduce((a,b)=>a+b,0)/4).toFixed(1) : '-';
+                let secondSemGrades = ['4th period','5th period','6th period','final exam'].map(p => parseFloat(periodMap[p]) || null);
+                let secondSemValid = secondSemGrades.filter(v => v !== null);
+                let secondSemAvg = secondSemValid.length === 4 ? (secondSemGrades.reduce((a,b)=>a+b,0)/4).toFixed(1) : '-';
+                let yearlyAvg = (firstSemAvg !== '-' && secondSemAvg !== '-') ? ((parseFloat(firstSemAvg)+parseFloat(secondSemAvg))/2).toFixed(1) : '-';
+                // For period averages
+                periodKeys.forEach((p, i) => {
+                    let val = parseFloat(periodMap[p]);
+                    if (!isNaN(val)) {
+                        periodTotals[i] += val;
+                        periodCounts[i]++;
+                    }
+                });
+                // For semester and yearly averages
+                if (firstSemAvg !== '-') sem1Averages.push(parseFloat(firstSemAvg));
+                if (secondSemAvg !== '-') sem2Averages.push(parseFloat(secondSemAvg));
+                if (yearlyAvg !== '-') yearlyAverages.push(parseFloat(yearlyAvg));
+                // Status (pass if >=60)
+                function status(val) { return val !== '-' && parseFloat(val) >= PASS_THRESHOLD ? 'Pass' : (val === '-' ? '' : 'Fail'); }
+                sem1Statuses.push(status(firstSemAvg));
+                sem2Statuses.push(status(secondSemAvg));
+                yearlyStatuses.push(status(yearlyAvg));
+                // Render row
+                const row = document.createElement('tr');
+                const tdSubject = document.createElement('td'); tdSubject.textContent = subject; row.appendChild(tdSubject);
+                const periodsToRender = ['1st period','2nd period','3rd period','1st semester exam','4th period','5th period','6th period','final exam'];
+                periodsToRender.forEach(p => {
+                    const td = document.createElement('td');
+                    td.innerHTML = formatGradeHTML(periodMap[p] || '');
+                    row.appendChild(td);
+                });
+                const tdFirstSem = document.createElement('td'); tdFirstSem.innerHTML = formatGradeHTML(firstSemAvg); row.appendChild(tdFirstSem);
+                const tdSecondSem = document.createElement('td'); tdSecondSem.innerHTML = formatGradeHTML(secondSemAvg); row.appendChild(tdSecondSem);
+                const tdYearly = document.createElement('td'); tdYearly.innerHTML = formatGradeHTML(yearlyAvg); row.appendChild(tdYearly);
+                fullSheetBody.appendChild(row);
+            });
+            // Period averages and status
+            periodCells.forEach((cell, i) => {
+                const avg = periodCounts[i] > 0 ? (periodTotals[i]/periodCounts[i]).toFixed(1) : '';
+                document.getElementById(cell).innerHTML = formatGradeHTML(avg);
+                document.getElementById(statusCells[i]).textContent = avg !== '' ? (parseFloat(avg) >= PASS_THRESHOLD ? 'Pass' : 'Fail') : '';
+            });
+            // Semester and yearly averages
+            const avg1sem = sem1Averages.length > 0 ? (sem1Averages.reduce((a,b)=>a+b,0)/sem1Averages.length).toFixed(1) : '';
+            const avg2sem = sem2Averages.length > 0 ? (sem2Averages.reduce((a,b)=>a+b,0)/sem2Averages.length).toFixed(1) : '';
+            const avgYearly = yearlyAverages.length > 0 ? (yearlyAverages.reduce((a,b)=>a+b,0)/yearlyAverages.length).toFixed(1) : '';
+            document.getElementById('avg-1sem').innerHTML = formatGradeHTML(avg1sem);
+            document.getElementById('avg-2sem').innerHTML = formatGradeHTML(avg2sem);
+            document.getElementById('avg-yearly').innerHTML = formatGradeHTML(avgYearly);
+            document.getElementById('status-1sem').textContent = avg1sem !== '' ? (parseFloat(avg1sem) >= PASS_THRESHOLD ? 'Pass' : 'Fail') : '';
+            document.getElementById('status-2sem').textContent = avg2sem !== '' ? (parseFloat(avg2sem) >= PASS_THRESHOLD ? 'Pass' : 'Fail') : '';
+            document.getElementById('status-yearly').textContent = avgYearly !== '' ? (parseFloat(avgYearly) >= PASS_THRESHOLD ? 'Pass' : 'Fail') : '';
+            // Total yearly average (across all subjects)
+            if (totalYearlyAverageSpan) {
+                totalYearlyAverageSpan.textContent = avgYearly !== '' ? avgYearly : '-';
+            }
+        }
+        
+        function filterStudentGrades() {
+            const subject = studentGradeSubject.value;
+            let filteredGrades = grades.filter(g => g.studentId === currentStudent.id);
+            
+            if (subject) {
+                filteredGrades = filteredGrades.filter(g => g.subject === subject);
+            }
+            
+            studentGradesTable.innerHTML = '';
+            filteredGrades.forEach(grade => {
+                const classInfo = classes.find(c => c.id === grade.classId);
+                const row = document.createElement('tr');
+                const tdSubj = document.createElement('td'); tdSubj.textContent = grade.subject; row.appendChild(tdSubj);
+                const tdGrade = document.createElement('td'); tdGrade.innerHTML = formatGradeHTML(grade.grade); row.appendChild(tdGrade);
+                const tdDate = document.createElement('td'); tdDate.textContent = grade.date; row.appendChild(tdDate);
+                studentGradesTable.appendChild(row);
+            });
+        }
+        
+        function loadStudentAttendance() {
+            studentAttendanceClass.innerHTML = '<option value="">All Classes</option>';
+            
+            // Get classes this student is enrolled in
+            const studentClasses = classes.filter(c => c.studentIds.includes(currentStudent.id));
+            
+            studentClasses.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls.id;
+                option.textContent = cls.name;
+                studentAttendanceClass.appendChild(option);
+            });
+            
+            // Display all attendance by default
+            filterStudentAttendance();
+        }
+        
+        function filterStudentAttendance() {
+            const classId = studentAttendanceClass.value ? parseInt(studentAttendanceClass.value) : null;
+            const attendanceRecords = [];
+            
+            attendance.forEach(a => {
+                // Skip if filtering by class and this isn't the right class
+                if (classId && a.classId !== classId) return;
+                
+                const record = a.records.find(r => r.studentId === currentStudent.id);
+                if (record) {
+                    const classInfo = classes.find(c => c.id === a.classId);
+                    attendanceRecords.push({
+                        className: classInfo ? classInfo.name : 'Unknown Class',
+                        date: a.date,
+                        present: record.present ? 'Present' : 'Absent'
+                    });
+                }
+            });
+            
+            studentAttendanceTable.innerHTML = '';
+            attendanceRecords.forEach(record => {
+                const row = document.createElement('tr');
+                const tdClass = document.createElement('td'); tdClass.textContent = record.className; row.appendChild(tdClass);
+                const tdDate = document.createElement('td'); tdDate.textContent = record.date; row.appendChild(tdDate);
+                const tdPresent = document.createElement('td'); tdPresent.textContent = record.present; row.appendChild(tdPresent);
+                studentAttendanceTable.appendChild(row);
+            });
+        }
+        
+        // Student Functions
+    async function addStudent(e) {
+            e.preventDefault();
+
+            const firstName = document.getElementById('student-first-name').value;
+            const lastName = document.getElementById('student-last-name').value;
+            const idNumber = document.getElementById('student-id-number').value;
+            const grade = document.getElementById('student-grade').value;
+            const parentContact = document.getElementById('student-parent-contact').value;
+            const email = document.getElementById('student-email').value;
+            const password = document.getElementById('student-password').value;
+            const photoFile = document.getElementById('student-photo').files[0];
+
+            // Try to create auth user via Edge Function if available and currentUser is admin
+            let remoteUserId = null;
+            if (supabaseClient && currentUser && currentUser.role === 'admin') {
+                try {
+                    const resp = await adminCreateAuthUser({ email, password, role: 'student', full_name: `${firstName} ${lastName}` });
+                    if (resp && resp.user && resp.user.id) {
+                        remoteUserId = resp.user.id;
+                    }
+                } catch (err) {
+                    console.warn('Admin remote create user failed, falling back to local user creation', err);
+                }
+            }
+
+            // Create user account locally (or record mapping to remote user)
+            const newUser = {
+                id: remoteUserId || (users.length > 0 ? Math.max(...users.map(u => (typeof u.id === 'number' ? u.id : 0))) + 1 : 1),
+                username: `${firstName} ${lastName}`,
+                email,
+                password: remoteUserId ? '' : password,
+                role: 'student',
+                authProvider: remoteUserId ? 'supabase' : 'local'
+            };
+
+            users.push(newUser);
+
+            // Handle photo: prefer uploading to storage when possible, otherwise use dataURL
+            let photoData = null;
+            if (photoFile) {
+                try {
+                    if (supabaseClient) {
+                        // create a deterministic path
+                        const dest = `photos/students/${newUser.id}_${Date.now()}`;
+                        try {
+                            const publicUrl = await uploadPhotoToStorage(photoFile, dest);
+                            photoData = publicUrl;
+                        } catch (storageErr) {
+                            // fallback to data URL
+                            photoData = await readFileAsDataURL(photoFile);
+                            console.warn('Upload to storage failed, using data URL', storageErr);
+                        }
+                    } else {
+                        photoData = await readFileAsDataURL(photoFile);
+                    }
+                } catch (e) {
+                    console.warn('Failed to read student photo', e);
+                }
+            }
+
+            const newStudent = {
+                id: students.length > 0 ? Math.max(...students.map(s => s.id)) + 1 : 1,
+                firstName,
+                lastName,
+                idNumber,
+                grade,
+                parentContact,
+                userId: newUser.id,
+                photo: photoData
+            };
+
+            students.push(newStudent);
+            studentForm.reset();
+            document.getElementById('student-photo-preview').innerHTML = 'No photo selected';
+            studentFormContainer.classList.add('hidden');
+            saveData();
+            // Sync new student to Supabase
+            if (supabaseClient) {
+                await syncStudentsToSupabase();
+            }
+            loadStudents();
+            loadDashboard();
+            addActivity(`Added student: ${firstName} ${lastName}`);
+        }
+        
+        function editStudent(id) {
+            const student = students.find(s => s.id === id);
+            if (!student) return;
+            
+            document.getElementById('student-first-name').value = student.firstName;
+            document.getElementById('student-last-name').value = student.lastName;
+            document.getElementById('student-id-number').value = student.idNumber;
+            document.getElementById('student-grade').value = student.grade;
+            document.getElementById('student-parent-contact').value = student.parentContact;
+            
+            // Display photo if exists
+            const photoPreview = document.getElementById('student-photo-preview');
+            photoPreview.innerHTML = '';
+            if (student.photo) {
+                const img = document.createElement('img');
+                img.src = student.photo;
+                img.className = 'photo-preview';
+                photoPreview.appendChild(img);
+            } else {
+                photoPreview.textContent = 'No photo selected';
+            }
+            
+            studentFormContainer.classList.remove('hidden');
+            studentForm.onsubmit = async function(e) {
+                e.preventDefault();
+                
+                student.firstName = document.getElementById('student-first-name').value;
+                student.lastName = document.getElementById('student-last-name').value;
+                student.idNumber = document.getElementById('student-id-number').value;
+                student.grade = document.getElementById('student-grade').value;
+                student.parentContact = document.getElementById('student-parent-contact').value;
+                
+                // Handle photo update (async)
+                const photoFile = document.getElementById('student-photo').files[0];
+                if (photoFile) {
+                    try {
+                        student.photo = await readFileAsDataURL(photoFile);
+                    } catch (e) {
+                        console.warn('Failed to read updated student photo', e);
+                    }
+                }
+                
+                studentForm.reset();
+                studentFormContainer.classList.add('hidden');
+                saveData();
+                loadStudents();
+                addActivity(`Updated student: ${student.firstName} ${student.lastName}`);
+            };
+        }
+        
+        function deleteStudent(id) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                const student = students.find(s => s.id === id);
+                if (!student) return;
+                
+                // Remove associated user account
+                if (student.userId) {
+                    users = users.filter(u => u.id !== student.userId);
+                }
+                
+                // Remove student from classes
+                classes.forEach(cls => {
+                    cls.studentIds = cls.studentIds.filter(sId => sId !== id);
+                });
+                
+                // Remove student's grades and attendance
+                grades = grades.filter(g => g.studentId !== id);
+                attendance.forEach(a => {
+                    a.records = a.records.filter(r => r.studentId !== id);
+                });
+                
+                students = students.filter(s => s.id !== id);
+                saveData();
+                loadStudents();
+                loadClasses();
+                loadDashboard();
+                addActivity(`Deleted student: ${student.firstName} ${student.lastName}`);
+            }
+        }
+        
+        // Teacher Functions
+    async function addTeacher(e) {
+            e.preventDefault();
+
+            const firstName = document.getElementById('teacher-first-name').value;
+            const lastName = document.getElementById('teacher-last-name').value;
+            const idNumber = document.getElementById('teacher-id-number').value;
+            // Collect checked subjects from the checkbox list
+            const subjectCheckboxes = document.querySelectorAll('.teacher-subject-checkbox');
+            const subjects = Array.from(subjectCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+            const email = document.getElementById('teacher-email').value;
+            const password = document.getElementById('teacher-password').value;
+            const photoFile = document.getElementById('teacher-photo').files[0];
+
+            // Try remote creation via Edge Function when possible
+            let remoteUserId = null;
+            if (supabaseClient && currentUser && currentUser.role === 'admin') {
+                try {
+                    const resp = await adminCreateAuthUser({ email, password, role: 'teacher', full_name: `${firstName} ${lastName}` });
+                    if (resp && resp.user && resp.user.id) remoteUserId = resp.user.id;
+                } catch (err) {
+                    console.warn('Admin remote create user failed, falling back to local user creation', err);
+                }
+            }
+
+            const newUser = {
+                id: remoteUserId || (users.length > 0 ? Math.max(...users.map(u => (typeof u.id === 'number' ? u.id : 0))) + 1 : 1),
+                username: `${firstName} ${lastName}`,
+                email,
+                password: remoteUserId ? '' : password,
+                role: 'teacher',
+                authProvider: remoteUserId ? 'supabase' : 'local'
+            };
+
+            users.push(newUser);
+
+            // Photo handling: try upload to storage first
+            let photoData = null;
+            if (photoFile) {
+                try {
+                    if (supabaseClient) {
+                        const dest = `photos/teachers/${newUser.id}_${Date.now()}`;
+                        try {
+                            const publicUrl = await uploadPhotoToStorage(photoFile, dest);
+                            photoData = publicUrl;
+                        } catch (storageErr) {
+                            photoData = await readFileAsDataURL(photoFile);
+                            console.warn('Upload to storage failed, using data URL', storageErr);
+                        }
+                    } else {
+                        photoData = await readFileAsDataURL(photoFile);
+                    }
+                } catch (e) {
+                    console.warn('Failed to read teacher photo', e);
+                }
+            }
+
+            const newTeacher = {
+                id: teachers.length > 0 ? Math.max(...teachers.map(t => t.id)) + 1 : 1,
+                firstName,
+                lastName,
+                idNumber,
+                subjects: subjects,
+                userId: newUser.id,
+                photo: photoData
+            };
+
+            teachers.push(newTeacher);
+            saveData();
+            // Sync new teacher to Supabase
+            if (supabaseClient) {
+                await syncTeachersToSupabase();
+            }
+            teacherForm.reset();
+            document.getElementById('teacher-photo-preview').innerHTML = 'No photo selected';
+            teacherFormContainer.classList.add('hidden');
+            loadTeachers();
+            loadDashboard();
+            addActivity(`Added teacher: ${firstName} ${lastName}`);
+        }
+        
+        function editTeacher(id) {
+            const teacher = teachers.find(t => t.id === id);
+            if (!teacher) return;
+            
+            document.getElementById('teacher-first-name').value = teacher.firstName;
+            document.getElementById('teacher-last-name').value = teacher.lastName;
+            document.getElementById('teacher-id-number').value = teacher.idNumber;
+            // populate checkboxes for subjects
+            const subjectCheckboxes = document.querySelectorAll('.teacher-subject-checkbox');
+            subjectCheckboxes.forEach(cb => cb.checked = false);
+            if (teacher.subjects && Array.isArray(teacher.subjects)) {
+                teacher.subjects.forEach(s => {
+                    const cb = Array.from(subjectCheckboxes).find(c => c.value === s);
+                    if (cb) cb.checked = true;
+                });
+            }
+            
+            // Display photo if exists
+            const photoPreview = document.getElementById('teacher-photo-preview');
+            photoPreview.innerHTML = '';
+            if (teacher.photo) {
+                const img = document.createElement('img');
+                img.src = teacher.photo;
+                img.className = 'photo-preview';
+                photoPreview.appendChild(img);
+            } else {
+                photoPreview.textContent = 'No photo selected';
+            }
+            
+            teacherFormContainer.classList.remove('hidden');
+            // Ensure the subjects wrapper is visible when editing so admin can see/check subjects
+            const subjWrapper = document.getElementById('teacher-subjects-wrapper');
+            if (subjWrapper) subjWrapper.classList.remove('hidden');
+            teacherForm.onsubmit = async function(e) {
+                e.preventDefault();
+                
+                teacher.firstName = document.getElementById('teacher-first-name').value;
+                teacher.lastName = document.getElementById('teacher-last-name').value;
+                teacher.idNumber = document.getElementById('teacher-id-number').value;
+                // Read updated subjects from checkboxes
+                const updatedSubjectCheckboxes = document.querySelectorAll('.teacher-subject-checkbox');
+                const updatedSubjects = Array.from(updatedSubjectCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+                teacher.subjects = updatedSubjects;
+                
+                // Handle photo update (async)
+                const photoFile = document.getElementById('teacher-photo').files[0];
+                if (photoFile) {
+                    try {
+                        teacher.photo = await readFileAsDataURL(photoFile);
+                    } catch (e) {
+                        console.warn('Failed to read updated teacher photo', e);
+                    }
+                }
+                
+                teacherForm.reset();
+                teacherFormContainer.classList.add('hidden');
+                saveData();
+                loadTeachers();
+                loadClasses();
+                addActivity(`Updated teacher: ${teacher.firstName} ${teacher.lastName}`);
+            };
+        }
+        
+        function deleteTeacher(id) {
+            if (confirm('Are you sure you want to delete this teacher?')) {
+                const teacher = teachers.find(t => t.id === id);
+                if (!teacher) return;
+                
+                // Remove associated user account
+                if (teacher.userId) {
+                    users = users.filter(u => u.id !== teacher.userId);
+                }
+                
+                // Remove teacher from classes
+                classes.forEach(cls => {
+                    if (cls.teacherId === id) {
+                        cls.teacherId = null;
+                    }
+                });
+                
+                teachers = teachers.filter(t => t.id !== id);
+                saveData();
+                loadTeachers();
+                loadClasses();
+                loadDashboard();
+                addActivity(`Deleted teacher: ${teacher.firstName} ${teacher.lastName}`);
+            }
+        }
+        
+        // Class Functions
+        function addClass(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('class-name').value;
+            const teacherId = parseInt(document.getElementById('class-teacher').value);
+            const studentOptions = document.getElementById('class-students').selectedOptions;
+            const studentIds = Array.from(studentOptions).map(option => parseInt(option.value));
+            const selectedGrade = classGradeSelect ? classGradeSelect.value : '';
+            
+            const newClass = {
+                id: classes.length > 0 ? Math.max(...classes.map(c => c.id)) + 1 : 1,
+                name,
+                teacherId,
+                studentIds
+            };
+            
+            classes.push(newClass);
+            classForm.reset();
+            classFormContainer.classList.add('hidden');
+            saveData();
+            loadClasses();
+            loadDashboard();
+            addActivity(`Added class: ${name}`);
+        }
+        
+        function editClass(id) {
+            const cls = classes.find(c => c.id === id);
+            if (!cls) return;
+            
+            document.getElementById('class-name').value = cls.name;
+            document.getElementById('class-teacher').value = cls.teacherId || '';
+            
+            // Select students in the multiselect
+            const studentSelect = document.getElementById('class-students');
+            // reset grade select when editing
+            if (classGradeSelect) classGradeSelect.value = '';
+            Array.from(studentSelect.options).forEach(option => {
+                option.selected = cls.studentIds.includes(parseInt(option.value));
+            });
+            
+            classFormContainer.classList.remove('hidden');
+            classForm.onsubmit = function(e) {
+                e.preventDefault();
+                
+                cls.name = document.getElementById('class-name').value;
+                cls.teacherId = parseInt(document.getElementById('class-teacher').value) || null;
+                
+                const studentOptions = document.getElementById('class-students').selectedOptions;
+                cls.studentIds = Array.from(studentOptions).map(option => parseInt(option.value));
+                
+                classForm.reset();
+                classFormContainer.classList.add('hidden');
+                saveData();
+                loadClasses();
+                addActivity(`Updated class: ${cls.name}`);
+            };
+        }
+        
+        function deleteClass(id) {
+            if (confirm('Are you sure you want to delete this class?')) {
+                const cls = classes.find(c => c.id === id);
+                if (!cls) return;
+                
+                // Remove attendance records for this class
+                attendance = attendance.filter(a => a.classId !== id);
+                
+                // Remove grades for this class
+                grades = grades.filter(g => g.classId !== id);
+                
+                classes = classes.filter(c => c.id !== id);
+                saveData();
+                loadClasses();
+                loadDashboard();
+                addActivity(`Deleted class: ${cls.name}`);
+            }
+        }
+        
+        // Attendance Functions
+        function loadAttendance() {
+            const classId = parseInt(attendanceClassSelect.value);
+            const date = document.getElementById('attendance-date').value || new Date().toISOString().split('T')[0];
+            
+            if (!classId) {
+                alert('Please select a class');
+                return;
+            }
+            
+            const cls = classes.find(c => c.id === classId);
+            if (!cls) return;
+            
+            const classStudents = students.filter(s => cls.studentIds.includes(s.id));
+            
+            attendanceTableBody.innerHTML = '';
+            classStudents.forEach(student => {
+                // Check if attendance already exists for this date
+                const existingAttendance = attendance.find(a => 
+                    a.classId === classId && 
+                    a.date === date
+                );
+                
+                const existingRecord = existingAttendance ? 
+                    existingAttendance.records.find(r => r.studentId === student.id) : 
+                    null;
+                
+                const row = document.createElement('tr');
+                const tdName = document.createElement('td'); tdName.textContent = `${student.firstName} ${student.lastName}`; row.appendChild(tdName);
+                const tdSelect = document.createElement('td');
+                const select = document.createElement('select'); select.className = 'attendance-status';
+                const optPresent = document.createElement('option'); optPresent.value = 'present'; optPresent.textContent = 'Present';
+                const optAbsent = document.createElement('option'); optAbsent.value = 'absent'; optAbsent.textContent = 'Absent';
+                if (existingRecord) {
+                    if (existingRecord.present) optPresent.selected = true; else optAbsent.selected = true;
+                }
+                select.appendChild(optPresent); select.appendChild(optAbsent);
+                tdSelect.appendChild(select); row.appendChild(tdSelect);
+                attendanceTableBody.appendChild(row);
+            });
+            
+            attendanceList.classList.remove('hidden');
+        }
+        
+        function saveAttendance() {
+            const classId = parseInt(attendanceClassSelect.value);
+            const date = document.getElementById('attendance-date').value || new Date().toISOString().split('T')[0];
+            
+            if (!classId) {
+                alert('Please select a class');
+                return;
+            }
+            
+            const cls = classes.find(c => c.id === classId);
+            if (!cls) return;
+            
+            const statusSelects = document.querySelectorAll('.attendance-status');
+            const records = [];
+            
+            cls.studentIds.forEach((studentId, index) => {
+                const status = statusSelects[index].value;
+                records.push({
+                    studentId,
+                    present: status === 'present'
+                });
+            });
+            
+            // Remove existing attendance for this class/date if any
+            attendance = attendance.filter(a => !(a.classId === classId && a.date === date));
+            
+            attendance.push({
+                classId,
+                date,
+                records
+            });
+            saveData();
+            // Sync attendance to Supabase
+            if (supabaseClient) {
+                syncAttendanceToSupabase().catch(e => console.warn('Attendance sync failed', e));
+            }
+            alert('Attendance saved successfully');
+            loadDashboard();
+            addActivity(`Marked attendance for class ${cls.name} on ${date}`);
+        }
+        
+        // Grades Functions
+        function loadGrades() {
+            const classId = parseInt(gradeClassSelect.value);
+            const subject = document.getElementById('grade-subject').value;
+            if (!classId || !subject) {
+                alert('Please select a class and enter a subject');
+                return;
+            }
+            const cls = classes.find(c => c.id === classId);
+            if (!cls) return;
+            const classStudents = students.filter(s => cls.studentIds.includes(s.id));
+            gradesTableBody.innerHTML = '';
+            // Periods to enter
+            const periods = [
+                '1st period',
+                '2nd period',
+                '3rd period',
+                '1st semester exam',
+                '4th period',
+                '5th period',
+                '6th period',
+                'final exam'
+            ];
+            classStudents.forEach(student => {
+                // For each period, find existing grade and create inputs
+                const row = document.createElement('tr');
+                const tdName = document.createElement('td'); tdName.textContent = `${student.firstName} ${student.lastName}`; row.appendChild(tdName);
+                periods.forEach(period => {
+                    const existing = grades.find(g =>
+                        g.studentId === student.id &&
+                        g.classId === classId &&
+                        g.subject === subject &&
+                        ((g.period && g.period.toLowerCase() === period) || g.subject.toLowerCase().includes(period))
+                    );
+                    const td = document.createElement('td');
+                    const input = document.createElement('input');
+                    input.type = 'text'; input.className = 'grade-input'; input.setAttribute('data-period', period);
+                    input.value = existing ? existing.grade : '';
+                    td.appendChild(input); row.appendChild(td);
+                });
+                // Store student id in row for saving
+                row.setAttribute('data-student-id', student.id);
+                gradesTableBody.appendChild(row);
+            });
+            gradesList.classList.remove('hidden');
+        }
+        
+        function saveGrades() {
+            const classId = parseInt(gradeClassSelect.value);
+            const subject = document.getElementById('grade-subject').value;
+            if (!classId || !subject) {
+                alert('Please select a class and enter a subject');
+                return;
+            }
+            const cls = classes.find(c => c.id === classId);
+            if (!cls) return;
+            // For each student row
+            const rows = gradesTableBody.querySelectorAll('tr');
+            const updatedStudentIds = new Set();
+            rows.forEach(row => {
+                const studentId = parseInt(row.getAttribute('data-student-id'));
+                const inputs = row.querySelectorAll('.grade-input');
+                inputs.forEach(input => {
+                    const period = (input.getAttribute('data-period') || '').toLowerCase().trim();
+                    const gradeValue = input.value.trim();
+                    if (!gradeValue) return;
+                    // Remove existing grade for this period and subject (match by period property)
+                    grades = grades.filter(g =>
+                        !(g.studentId === studentId && g.classId === classId && g.subject === subject && g.period && g.period.toLowerCase() === period)
+                    );
+                    grades.push({
+                        studentId,
+                        classId,
+                        subject,
+                        grade: gradeValue,
+                        period: period,
+                        date: new Date().toISOString().split('T')[0]
+                    });
+                    updatedStudentIds.add(studentId);
+                });
+            });
+            // Persist grades
+            saveData();
+            // Sync grades to Supabase
+            if (supabaseClient) {
+                syncGradesToSupabase().catch(e => console.warn('Grades sync failed', e));
+            }
+            alert('Grades saved successfully');
+            addActivity(`Recorded grades for ${subject} in class ${cls.name}`);
+            // Notify other parts of the app that grades have been updated
+            try {
+                const ev = new CustomEvent('gradesUpdated', { detail: { classId, subject, updatedStudentIds: Array.from(updatedStudentIds) } });
+                window.dispatchEvent(ev);
+            } catch (e) {
+                // fallback for older browsers
+                window.__gradesUpdated = { classId, subject, updatedStudentIds: Array.from(updatedStudentIds) };
+            }
+            // If a student is currently logged in and their grades were updated, re-render their sheet
+            if (currentUser && currentUser.role === 'student' && currentStudent && updatedStudentIds.has(currentStudent.id)) {
+                renderFullGradeSheet();
+            }
+        }
+        
+        // Activity Log
+        function addActivity(message) {
+            const activityItem = document.createElement('li');
+            activityItem.textContent = message;
+            recentActivities.insertBefore(activityItem, recentActivities.firstChild);
+            
+            // Keep only the last 10 activities
+            if (recentActivities.children.length > 10) {
+                recentActivities.removeChild(recentActivities.lastChild);
+            }
+        }
+        
+        // Event Listeners
+        // Login/Register
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginPage.classList.add('hidden');
+            registerPage.classList.remove('hidden');
+        });
+        
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerPage.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+        });
+        
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const role = document.getElementById('login-role').value;
+
+            // (debugging removed for production)
+
+            // If Supabase is configured, try authenticating against it first
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    const user = data.user;
+                    // Attempt to load profile from `profiles` table
+                    const { data: profile, error: profileErr } = await supabaseClient
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', user.id)
+                        .single();
+                    // Build currentUser from profile or fallback
+                    currentUser = {
+                        id: user.id,
+                        username: profile ? profile.full_name || email : email,
+                        email,
+                        role: (profile && profile.role) ? profile.role : role,
+                        authProvider: 'supabase'
+                    };
+
+                    // Try to load student/teacher rows linked by user_id
+                    if (currentUser.role === 'student') {
+                        const { data: studentRow } = await supabaseClient.from('students').select('*').eq('user_id', user.id).limit(1).maybeSingle();
+                        if (studentRow) {
+                            currentStudent = studentRow;
+                        }
+                    } else if (currentUser.role === 'teacher') {
+                        const { data: teacherRow } = await supabaseClient.from('teachers').select('*').eq('user_id', user.id).limit(1).maybeSingle();
+                        if (teacherRow) {
+                            currentTeacher = teacherRow;
+                        }
+                    }
+
+                    document.body.className = currentUser.role;
+                    loginPage.classList.add('hidden');
+                    registerPage.classList.add('hidden');
+                    app.classList.remove('hidden');
+                    navigateTo('dashboard');
+                    try { adaptToDevice(); } catch(e) {}
+                    alert(`Welcome back, ${currentUser.username}! (${currentUser.role})`);
+                    return;
+                } catch (err) {
+                    console.warn('Supabase login failed, falling back to local auth', err);
+                    showAlert(loginAlert, (err && err.message) ? err.message : 'Supabase login failed — falling back to local auth');
+                    // allow fallback to local auth below
+                }
+            }
+
+            // Local fallback (for development / before Supabase is configured)
+            const localUser = users.find(u => {
+                if (!u) return false;
+                const uemail = String(u.email || '').toLowerCase().trim();
+                const reqEmail = String(email || '').toLowerCase().trim();
+                const urole = String(u.role || '').toLowerCase().trim();
+                const reqRole = String(role || '').toLowerCase().trim();
+                return uemail === reqEmail && urole === reqRole && u.password === password;
+            });
+
+            // (debugging removed for production)
+            if (localUser) {
+                currentUser = localUser;
+                document.body.className = localUser.role;
+                if (localUser.role === 'student') currentStudent = students.find(s => s.userId === localUser.id);
+                if (localUser.role === 'teacher') currentTeacher = teachers.find(t => t.userId === localUser.id);
+                loginPage.classList.add('hidden');
+                registerPage.classList.add('hidden');
+                app.classList.remove('hidden');
+                navigateTo('dashboard');
+                try { adaptToDevice(); } catch(e) {}
+                // If this is a local account using the default password, force a password change
+                try { await checkAndForceChangePassword(currentUser); } catch (e) { /* ignore */ }
+                alert(`Welcome back, ${localUser.username}! (${localUser.role})`);
+            } else {
+                // Provide a helpful diagnostic for failed local login (no sensitive data)
+                try {
+                    const diag = (function(email, role) {
+                        const e = String(email || '').toLowerCase().trim();
+                        const matching = users.filter(u => u && String(u.email || '').toLowerCase().trim() === e);
+                        const summary = matching.map(u => ({ id: u.id, role: u.role, authProvider: u.authProvider || 'local', hasPassword: !!u.password }));
+                        return { attemptedEmail: e, attemptedRole: String(role || '').toLowerCase().trim(), foundCount: matching.length, accounts: summary };
+                    })(email, role);
+                    console.warn('[login] local fallback failed — diagnostic:', diag);
+                    // Debug element removed in production; leave console warning for diagnostics
+                    // If needed re-enable an on-page debug area by creating an element with id="login-debug"
+                    // Friendly alert based on diagnostic
+                    if (diag.foundCount === 0) {
+                        showAlert(loginAlert, 'No local account found for that email. If this is a Supabase account, sign in via Supabase or register locally.', 'danger');
+                    } else {
+                        // If account exists but has no local password, advise Supabase or password reset
+                        const remoteOnly = diag.accounts.every(a => a.authProvider && a.authProvider !== 'local');
+                        if (remoteOnly) {
+                            showAlert(loginAlert, 'An account exists for that email but is remote-only (Supabase). Use Supabase login or run the admin import to create a local mapping.', 'danger');
+                        } else {
+                            showAlert(loginAlert, 'Account found but credentials did not match. Try resetting the password or use Dev controls to inspect users.', 'danger');
+                        }
+                    }
+                } catch (e) {
+                    showAlert(loginAlert, 'Invalid email, password, or role selection');
+                }
+            }
+        });
+        
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const role = document.getElementById('register-role').value;
+
+            let userId = null;
+            let registeredViaSupabase = false;
+
+            if (supabaseClient) {
+                try {
+                    // Sign up user in Supabase Auth
+                    const { data, error } = await supabaseClient.auth.signUp({ 
+                        email, 
+                        password, 
+                        options: { 
+                            data: { 
+                                role, 
+                                full_name: username 
+                            } 
+                        } 
+                    });
+                    if (error) throw error;
+                    
+                    userId = data.user ? data.user.id : null;
+                    registeredViaSupabase = true;
+                    
+                    // The trigger handle_new_user() will create a profiles row automatically
+                    // But we need to update it with email and role from metadata
+                    if (userId) {
+                        try {
+                            // Update the profile with correct email and role
+                            await supabaseClient.from('profiles').update({ 
+                                email: email, 
+                                role: role, 
+                                full_name: username 
+                            }).eq('id', userId);
+                            
+                            // Create student or teacher records
+                            if (role === 'student') {
+                                const nextId = students.filter(s => s.idNumber).length + 1;
+                                await supabaseClient.from('students').insert([{
+                                    profile_id: userId,
+                                    student_id: `ST${String(nextId).padStart(3, '0')}`,
+                                    first_name: username,
+                                    last_name: '',
+                                    email: email,
+                                    enrollment_date: new Date().toISOString().split('T')[0]
+                                }]);
+                            } else if (role === 'teacher') {
+                                const nextId = teachers.filter(t => t.idNumber).length + 1;
+                                await supabaseClient.from('teachers').insert([{
+                                    profile_id: userId,
+                                    id_number: `TC${String(nextId).padStart(3, '0')}`,
+                                    first_name: username,
+                                    last_name: '',
+                                    email: email,
+                                    hire_date: new Date().toISOString().split('T')[0]
+                                }]);
+                            }
+                        } catch (insertErr) {
+                            console.warn('Could not create student/teacher record, but user was created in auth', insertErr);
+                        }
+                    }
+                    
+                    showAlert(registerAlert, 'Registration successful! Your account has been saved to Supabase. Please log in.', 'success');
+                    
+                    // Clear form and go back to login
+                    registerForm.reset();
+                    registerPage.classList.add('hidden');
+                    loginPage.classList.remove('hidden');
+                    return;
+                } catch (err) {
+                    console.warn('Supabase registration failed', err);
+                    const errorMsg = err && err.message ? err.message : 'Supabase registration failed';
+                    showAlert(registerAlert, errorMsg, 'danger');
+                    // Don't fall through to local registration if user already exists in Supabase
+                    if (err.message && err.message.includes('User already registered')) {
+                        return;
+                    }
+                }
+            }
+
+            // Local fallback registration (only if Supabase registration fails)
+            if (users.some(u => u.email === email)) {
+                showAlert(registerAlert, 'Email already registered', 'danger');
+                return;
+            }
+
+            const newUser = {
+                id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
+                username,
+                email,
+                password,
+                role,
+                authProvider: 'local'
+            };
+
+            users.push(newUser);
+            currentUser = newUser;
+
+            registerPage.classList.add('hidden');
+            app.classList.remove('hidden');
+            navigateTo('dashboard');
+            try { adaptToDevice(); } catch(e) {}
+
+            // If student, create student profile
+            if (role === 'student') {
+                const newStudent = {
+                    id: students.length > 0 ? Math.max(...students.map(s => s.id)) + 1 : 1,
+                    firstName: username,
+                    lastName: '',
+                    idNumber: 'ST' + (students.length + 1).toString().padStart(3, '0'),
+                    grade: '1',
+                    parentContact: email,
+                    userId: newUser.id,
+                    photo: null
+                };
+                students.push(newStudent);
+                currentStudent = newStudent;
+            }
+
+            // If teacher, create teacher profile
+            if (role === 'teacher') {
+                const newTeacher = {
+                    id: teachers.length > 0 ? Math.max(...teachers.map(t => t.id)) + 1 : 1,
+                    firstName: username,
+                    lastName: '',
+                    idNumber: 'TC' + (teachers.length + 1).toString().padStart(3, '0'),
+                    subject: 'General',
+                    userId: newUser.id,
+                    photo: null
+                };
+                teachers.push(newTeacher);
+                currentTeacher = newTeacher;
+            }
+
+            // Persist new user/profile locally
+            saveData();
+            addActivity(`New user registered: ${username} (${role})`);
+        });
+        
+        // Navigation
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentUser = null;
+            currentStudent = null;
+            currentTeacher = null;
+            document.body.className = '';
+            app.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+        });
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = link.getAttribute('data-page');
+                navigateTo(page);
+            });
+        });
+        
+        // Students
+        addStudentBtn.addEventListener('click', () => {
+            studentFormContainer.classList.remove('hidden');
+            studentForm.onsubmit = addStudent;
+        });
+        
+        cancelStudentBtn.addEventListener('click', () => {
+            studentForm.reset();
+            document.getElementById('student-photo-preview').innerHTML = 'No photo selected';
+            studentFormContainer.classList.add('hidden');
+        });
+        
+        // Teachers
+        addTeacherBtn.addEventListener('click', () => {
+            teacherFormContainer.classList.remove('hidden');
+            // Hide subjects wrapper by default when opening Add Teacher form
+            const subjWrapper = document.getElementById('teacher-subjects-wrapper');
+            if (subjWrapper) subjWrapper.classList.add('hidden');
+            teacherForm.onsubmit = addTeacher;
+        });
+        
+        cancelTeacherBtn.addEventListener('click', () => {
+            teacherForm.reset();
+            document.getElementById('teacher-photo-preview').innerHTML = 'No photo selected';
+            teacherFormContainer.classList.add('hidden');
+        });
+        
+        // Classes
+        addClassBtn.addEventListener('click', () => {
+            classFormContainer.classList.remove('hidden');
+            // Reset grade select and populate students list with all students by default
+            if (classGradeSelect) {
+                classGradeSelect.value = '';
+                populateStudentsByGrade('');
+            }
+            classForm.onsubmit = addClass;
+        });
+        
+        cancelClassBtn.addEventListener('click', () => {
+            classForm.reset();
+            if (classGradeSelect) classGradeSelect.value = '';
+            classFormContainer.classList.add('hidden');
+        });
+        
+        // Attendance
+        loadAttendanceBtn.addEventListener('click', loadAttendance);
+        saveAttendanceBtn.addEventListener('click', saveAttendance);
+        
+        // Grades
+        loadGradesBtn.addEventListener('click', loadGrades);
+        saveGradesBtn.addEventListener('click', saveGrades);
+        
+        // Student Grades
+        filterGradesBtn.addEventListener('click', filterStudentGrades);
+        
+        // Student Attendance
+        filterAttendanceBtn.addEventListener('click', filterStudentAttendance);
+        
+        // Photo Upload Previews
+        document.getElementById('student-photo').addEventListener('change', function() {
+            handlePhotoUpload(this, document.getElementById('student-photo-preview'));
+        });
+        
+        document.getElementById('teacher-photo').addEventListener('change', function() {
+            handlePhotoUpload(this, document.getElementById('teacher-photo-preview'));
+        });
+
+        // Developer helpers removed for production
+
+        // Force-change password helper for local accounts that still use the default password
+        async function checkAndForceChangePassword(user) {
+            try {
+                if (!user) return;
+                if (String(user.authProvider || 'local') !== 'local') return;
+                // If the account explicitly requests a change or still uses the default password
+                const isDefault = user.mustChangePassword || (user.password && user.password === 'admin123');
+                if (!isDefault) return;
+                // Prompt user to change password (simple prompt flow)
+                let newPwd = null;
+                while (true) {
+                    newPwd = prompt('Your account is using the default password. Please enter a new password (min 6 chars):', '');
+                    if (newPwd === null) {
+                        alert('You must change the default password to continue. Please login again after changing it.');
+                        return;
+                    }
+                    if (String(newPwd).length < 6) { alert('Password must be at least 6 characters.'); continue; }
+                    const confirmPwd = prompt('Confirm new password:','');
+                    if (confirmPwd === newPwd) break;
+                    alert('Passwords do not match, please try again.');
+                }
+                // Update the stored user (local-only)
+                const u = users.find(x => x && x.id === user.id);
+                if (u) {
+                    u.password = newPwd;
+                    u.mustChangePassword = false;
+                    saveData();
+                    alert('Password updated successfully.');
+                }
+            } catch (e) {
+                console.warn('checkAndForceChangePassword failed', e);
+            }
+        }
+
+        // Responsive device adaptation: applies classes and tweaks root font-size on resize/login
+        function adaptToDevice() {
+            try {
+                const w = window.innerWidth || document.documentElement.clientWidth;
+                // Clear previous viewport classes
+                document.body.classList.remove('viewport-xs','viewport-sm','viewport-md','viewport-lg');
+                if (w < 480) document.body.classList.add('viewport-xs');
+                else if (w < 768) document.body.classList.add('viewport-sm');
+                else if (w < 1024) document.body.classList.add('viewport-md');
+                else document.body.classList.add('viewport-lg');
+
+                // Slightly adjust root font-size as a fallback for older browsers
+                // Keep within a sane range so layout doesn't break: 13px..20px
+                const scale = Math.max(13, Math.min(20, Math.round((w / 1024) * 16)));
+                document.documentElement.style.fontSize = scale + 'px';
+            } catch (e) {
+                // non-fatal
+                console.debug('adaptToDevice failed', e);
+            }
+        }
+
+        // Run adaptToDevice on resize and orientation change
+        window.addEventListener('resize', () => { adaptToDevice(); });
+        window.addEventListener('orientationchange', () => { setTimeout(adaptToDevice, 200); });
+
+        // devCreateLocalAdmin removed
+        
+    // Initialize
+    (async function initApp() {
+        // Load persisted data if available
+        loadData();
+
+        // Ensure a default admin exists for local fallback so admin can always log in
+        try {
+            // Only create a local default admin when Supabase is not configured
+            if (!supabaseClient) {
+                const adminEmail = 'admin@school.com';
+                // find by email case-insensitive
+                const existing = users.find(u => u && String(u.email || '').toLowerCase() === adminEmail.toLowerCase());
+                if (!existing) {
+                    const adminUser = {
+                        id: users.length > 0 ? Math.max(...users.map(u => (typeof u.id === 'number' ? u.id : 0))) + 1 : 1,
+                        username: 'Administrator',
+                        email: adminEmail,
+                        password: 'admin123',
+                        role: 'admin',
+                        authProvider: 'local'
+                    };
+                    users.push(adminUser);
+                    saveData();
+                    try { addActivity('Created default admin account (admin@school.com)'); } catch(e) {}
+                    console.info('Default admin created for local fallback');
+                } else {
+                    // If account exists but has no password and is local, set the default password so login works
+                    if ((existing.authProvider === 'local' || !existing.authProvider) && !existing.password) {
+                        existing.password = 'admin123';
+                        saveData();
+                        try { addActivity('Restored default admin password'); } catch(e) {}
+                        console.info('Restored password for existing local admin');
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to ensure default admin', e);
+        }
+        // If Supabase is configured, fetch canonical data from remote DB
+        if (supabaseClient) {
+            await loadFromSupabase();
+            // Try to pick up session user if already signed in
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) {
+                    // Attempt to resolve profile and set currentUser/currentStudent/currentTeacher
+                    const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).limit(1).maybeSingle();
+                    currentUser = profile ? { id: user.id, username: profile.full_name || user.email, email: user.email, role: profile.role } : { id: user.id, username: user.email, email: user.email, role: 'student' };
+                    if (currentUser.role === 'student') {
+                        const { data: stud } = await supabaseClient.from('students').select('*').eq('user_id', user.id).limit(1).maybeSingle();
+                        if (stud) currentStudent = {
+                            id: stud.id,
+                            firstName: stud.first_name,
+                            lastName: stud.last_name,
+                            idNumber: stud.id_number,
+                            grade: stud.grade,
+                            parentContact: stud.parent_contact,
+                            userId: stud.user_id,
+                            photo: stud.photo_url
+                        };
+                    } else if (currentUser.role === 'teacher') {
+                        const { data: tch } = await supabaseClient.from('teachers').select('*').eq('user_id', user.id).limit(1).maybeSingle();
+                        if (tch) currentTeacher = {
+                            id: tch.id,
+                            firstName: tch.first_name,
+                            lastName: tch.last_name,
+                            idNumber: tch.id_number,
+                            subjects: Array.isArray(tch.subjects) ? tch.subjects : (tch.subject ? [tch.subject] : []),
+                            userId: tch.user_id,
+                            photo: tch.photo_url
+                        };
+                    }
+                    if (currentUser) {
+                        document.body.className = currentUser.role;
+                        loginPage.classList.add('hidden');
+                        app.classList.remove('hidden');
+                        navigateTo('dashboard');
+                        try { adaptToDevice(); } catch(e) {}
+                    }
+                }
+            } catch (e) {
+                // ignore session lookup failures
+            }
+        }
+
+        document.getElementById('attendance-date').value = new Date().toISOString().split('T')[0];
+
+        // Make helper functions available globally for onclick attributes
+        window.editStudent = editStudent;
+        window.deleteStudent = deleteStudent;
+        window.editTeacher = editTeacher;
+        window.deleteTeacher = deleteTeacher;
+        window.editClass = editClass;
+        window.deleteClass = deleteClass;
+    })();
+
+        // Demo helpers removed
+        // Allow admin to add a new subject inline when creating a teacher
+        const addTeacherSubjectBtn = document.getElementById('add-teacher-subject-btn');
+        if (addTeacherSubjectBtn) {
+            addTeacherSubjectBtn.addEventListener('click', function() {
+                const input = document.getElementById('new-teacher-subject');
+                if (!input) return;
+                const name = input.value.trim();
+                if (!name) {
+                    alert('Please enter a subject name');
+                    return;
+                }
+                const container = document.getElementById('teacher-subjects-container');
+                const wrapper = document.getElementById('teacher-subjects-wrapper');
+                if (!container) return;
+                // ensure wrapper is visible when adding a new subject
+                if (wrapper) wrapper.classList.remove('hidden');
+                // avoid duplicates (case-insensitive) among existing checkboxes
+                const exists = Array.from(container.querySelectorAll('.teacher-subject-checkbox')).some(cb => cb.value.toLowerCase() === name.toLowerCase());
+                if (!exists) {
+                    const label = document.createElement('label');
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.className = 'teacher-subject-checkbox';
+                    cb.value = name;
+                    label.appendChild(cb);
+                    label.appendChild(document.createTextNode(' ' + name));
+                    container.appendChild(label);
+                    cb.checked = true;
+                } else {
+                    // if exists, check it
+                    const existing = Array.from(container.querySelectorAll('.teacher-subject-checkbox')).find(cb => cb.value.toLowerCase() === name.toLowerCase());
+                    if (existing) existing.checked = true;
+                }
+                input.value = '';
+            });
+        }
+
+    // Demo quick-login buttons removed per admin request
+
+        // Toggle button to show/hide subjects when needed in the teacher form
+        const toggleSubjectsBtn = document.getElementById('toggle-teacher-subjects-btn');
+        if (toggleSubjectsBtn) {
+            toggleSubjectsBtn.addEventListener('click', function() {
+                const wrapper = document.getElementById('teacher-subjects-wrapper');
+                if (!wrapper) return;
+                wrapper.classList.toggle('hidden');
+            });
+        }
+
+        // Attach grade select listener once
+        if (classGradeSelect) {
+            classGradeSelect.addEventListener('change', function() {
+                populateStudentsByGrade(this.value);
+            });
+        }
+    </script>
+</body>
+</html>

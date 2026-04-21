@@ -1,0 +1,13 @@
+{
+  "name": "school-management",
+  "version": "1.0.0",
+  "description": "Static front-end with optional Supabase backend for school management",
+  "type": "commonjs",
+  "scripts": {
+    "create-user": "node scripts/admin_create_user.js",
+    "import-demo": "node scripts/import_demo.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.29.0"
+  }
+}
