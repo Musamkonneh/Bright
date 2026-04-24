@@ -594,7 +594,10 @@
                 </div>
                 <button type="submit" class="btn btn-success" style="width: 100%;">Login</button>
             </form>
-            <p class="text-center mt-2">Don't have an account? <a href="#" id="show-register">Register</a></p>
+            <div class="text-center mt-2">
+                <p>Don't have an account? <a href="#" id="show-register">Register</a></p>
+                <p><small><a href="#" id="clear-session" class="text-muted">Clear Session</a></small></p>
+            </div>
         </div>
     </div>
 
@@ -2895,7 +2898,28 @@
             registerPage.classList.add('hidden');
             loginPage.classList.remove('hidden');
         });
-        
+
+        // Clear session button
+        const clearSessionBtn = document.getElementById('clear-session');
+        if (clearSessionBtn) {
+            clearSessionBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    if (supabaseClient) {
+                        await supabaseSignOut();
+                        console.info('Session cleared');
+                    }
+                    // Clear any local session data
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    alert('Session cleared! Please refresh the page.');
+                } catch (error) {
+                    console.warn('Failed to clear session:', error);
+                    alert('Failed to clear session. Try refreshing the page.');
+                }
+            });
+        }
+
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -3169,8 +3193,17 @@
         });
         
         // Navigation
-        logoutBtn.addEventListener('click', (e) => {
+        logoutBtn.addEventListener('click', async (e) => {
             e.preventDefault();
+            try {
+                // Sign out from Supabase first
+                if (supabaseClient) {
+                    await supabaseSignOut();
+                }
+            } catch (error) {
+                console.warn('Supabase signout failed:', error);
+            }
+            // Clear local state
             currentUser = null;
             currentStudent = null;
             currentTeacher = null;
@@ -3358,7 +3391,9 @@
         // If Supabase is configured, fetch canonical data from remote DB
         if (supabaseClient) {
             await loadFromSupabase();
-            // Try to pick up session user if already signed in
+            // TEMPORARILY DISABLED: Auto session recovery causing issues
+            // Uncomment below to re-enable automatic login
+            /*
             try {
                 const { data: { user } } = await supabaseClient.auth.getUser();
                 if (user) {
@@ -3400,6 +3435,7 @@
             } catch (e) {
                 // ignore session lookup failures
             }
+            */
         }
 
         document.getElementById('attendance-date').value = new Date().toISOString().split('T')[0];
