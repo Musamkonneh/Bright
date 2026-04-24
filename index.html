@@ -1174,6 +1174,7 @@
             if (!SUPABASE_URL.includes('REPLACE') && !SUPABASE_ANON_KEY.includes('REPLACE')) {
                 supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 console.info('✓ Supabase client initialized');
+                console.info('ℹ Data loading from Supabase deferred until login (avoids RLS policy errors)');
                 
                 // Check if edge function is configured
                 if (!SUPABASE_EDGE_CREATE_USER_URL.includes('REPLACE')) {
@@ -1489,49 +1490,62 @@
         async function loadFromSupabase() {
             if (!supabaseClient) return;
             try {
+                console.log('Loading data from Supabase...');
+                
                 // Load students
                 const { data: srows, error: sErr } = await supabaseClient.from('students').select('*');
-                if (!sErr && Array.isArray(srows)) {
+                if (sErr) {
+                    console.warn('Failed to load students from Supabase:', sErr.message);
+                } else if (Array.isArray(srows)) {
                     students = srows.map(r => ({
                         id: r.id,
                         firstName: r.first_name || r.firstName || '',
                         lastName: r.last_name || r.lastName || '',
-                        idNumber: r.id_number || r.idNumber || '',
+                        idNumber: r.student_id || r.idNumber || '',
                         grade: r.grade || r.grade_level || '',
                         parentContact: r.parent_contact || r.parentContact || '',
-                        userId: r.user_id || r.userId || null,
+                        userId: r.profile_id || r.userId || null,
                         photo: r.photo_url || r.photo || null
                     }));
+                    console.log(`✓ Loaded ${students.length} students from Supabase`);
                 }
 
                 // Load teachers
                 const { data: trows, error: tErr } = await supabaseClient.from('teachers').select('*');
-                if (!tErr && Array.isArray(trows)) {
+                if (tErr) {
+                    console.warn('Failed to load teachers from Supabase:', tErr.message);
+                } else if (Array.isArray(trows)) {
                     teachers = trows.map(r => ({
                         id: r.id,
                         firstName: r.first_name || r.firstName || '',
                         lastName: r.last_name || r.lastName || '',
-                        idNumber: r.id_number || r.idNumber || '',
+                        idNumber: r.teacher_id || r.idNumber || '',
                         subjects: Array.isArray(r.subjects) ? r.subjects : (r.subject ? [r.subject] : []),
-                        userId: r.user_id || r.userId || null,
+                        userId: r.profile_id || r.userId || null,
                         photo: r.photo_url || r.photo || null
                     }));
+                    console.log(`✓ Loaded ${teachers.length} teachers from Supabase`);
                 }
 
                 // Load classes
                 const { data: crows, error: cErr } = await supabaseClient.from('classes').select('*');
-                if (!cErr && Array.isArray(crows)) {
+                if (cErr) {
+                    console.warn('Failed to load classes from Supabase:', cErr.message);
+                } else if (Array.isArray(crows)) {
                     classes = crows.map(r => ({
                         id: r.id,
                         name: r.name,
                         teacherId: r.teacher_id || r.teacherId || null,
                         studentIds: Array.isArray(r.student_ids) ? r.student_ids.map(v => parseInt(v)) : (Array.isArray(r.studentIds) ? r.studentIds : [])
                     }));
+                    console.log(`✓ Loaded ${classes.length} classes from Supabase`);
                 }
 
                 // Load grades
                 const { data: grows, error: gErr } = await supabaseClient.from('grades').select('*');
-                if (!gErr && Array.isArray(grows)) {
+                if (gErr) {
+                    console.warn('Failed to load grades from Supabase:', gErr.message);
+                } else if (Array.isArray(grows)) {
                     grades = grows.map(r => ({
                         studentId: r.student_id || r.studentId,
                         classId: r.class_id || r.classId,
@@ -1540,23 +1554,28 @@
                         period: r.period,
                         date: r.date
                     }));
+                    console.log(`✓ Loaded ${grades.length} grades from Supabase`);
                 }
 
                 // Load attendance
                 const { data: arows, error: aErr } = await supabaseClient.from('attendance').select('*');
-                if (!aErr && Array.isArray(arows)) {
+                if (aErr) {
+                    console.warn('Failed to load attendance from Supabase:', aErr.message);
+                } else if (Array.isArray(arows)) {
                     attendance = arows.map(r => ({
                         classId: r.class_id || r.classId,
                         date: r.date,
                         records: r.records || r.records_json || []
                     }));
+                    console.log(`✓ Loaded ${attendance.length} attendance records from Supabase`);
                 }
 
                 // Persist fetched data locally for offline use
                 saveData();
-                console.info('Loaded data from Supabase');
+                console.log('✓ Successfully loaded all data from Supabase');
             } catch (err) {
-                console.warn('Failed to load from Supabase', err);
+                console.warn('Failed to load from Supabase:', err.message);
+                console.log('⚠ Using local data only (Supabase unavailable)');
             }
         }
 
@@ -2968,6 +2987,17 @@
                     app.classList.remove('hidden');
                     navigateTo('dashboard');
                     try { adaptToDevice(); } catch(e) {}
+                    
+                    // Load fresh data from Supabase after successful login
+                    if (supabaseClient) {
+                        try {
+                            await loadFromSupabase();
+                            console.log('✓ Loaded latest data from Supabase after login');
+                        } catch (loadErr) {
+                            console.warn('Failed to load data from Supabase after login:', loadErr);
+                        }
+                    }
+                    
                     alert(`Welcome back, ${currentUser.username}! (${currentUser.role})`);
                     return;
                 } catch (err) {
@@ -2998,6 +3028,17 @@
                 app.classList.remove('hidden');
                 navigateTo('dashboard');
                 try { adaptToDevice(); } catch(e) {}
+                
+                // For local login, load Supabase data if user is admin and Supabase is available
+                if (supabaseClient && localUser.role === 'admin') {
+                    try {
+                        await loadFromSupabase();
+                        console.log('✓ Loaded latest data from Supabase for admin');
+                    } catch (loadErr) {
+                        console.warn('Failed to load data from Supabase for admin:', loadErr);
+                    }
+                }
+                
                 // If this is a local account using the default password, force a password change
                 try { await checkAndForceChangePassword(currentUser); } catch (e) { /* ignore */ }
                 alert(`Welcome back, ${localUser.username}! (${localUser.role})`);
@@ -3389,8 +3430,8 @@
             console.warn('Failed to ensure default admin', e);
         }
         // If Supabase is configured, fetch canonical data from remote DB
-        if (supabaseClient) {
-            await loadFromSupabase();
+        // NOTE: loadFromSupabase is now called AFTER login, not on startup
+        // This prevents RLS policy errors when no user is authenticated
             // TEMPORARILY DISABLED: Auto session recovery causing issues
             // Uncomment below to re-enable automatic login
             /*
