@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Connection Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Supabase Connection Test</h1>
+    <div id="results"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://zvmftgptxrpkgvvmivtr.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_w9PqCK-12Xd9xbP_zatm3Q_uTme3lDT';
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const results = document.getElementById('results');
+
+        async function runTests() {
+            results.innerHTML = '<h2>Running Tests...</h2>';
+
+            // Test 1: Basic connection
+            try {
+                const { data, error } = await supabase.from('profiles').select('count').limit(1);
+                if (error) throw error;
+                results.innerHTML += '<p>✅ Test 1: Basic connection - PASS</p>';
+            } catch (error) {
+                results.innerHTML += `<p>❌ Test 1: Basic connection - FAIL: ${error.message}</p>`;
+            }
+
+            // Test 2: Auth status
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    results.innerHTML += `<p>✅ Test 2: User logged in - ${user.email}</p>`;
+                } else {
+                    results.innerHTML += '<p>⚠️ Test 2: No user logged in (expected for new session)</p>';
+                }
+            } catch (error) {
+                results.innerHTML += `<p>❌ Test 2: Auth check - FAIL: ${error.message}</p>`;
+            }
+
+            // Test 3: Check if tables exist
+            const tables = ['profiles', 'students', 'teachers', 'grades', 'attendance'];
+            for (const table of tables) {
+                try {
+                    const { data, error } = await supabase.from(table).select('*').limit(1);
+                    if (error && !error.message.includes('permission denied')) throw error;
+                    results.innerHTML += `<p>✅ Test 3: Table '${table}' accessible</p>`;
+                } catch (error) {
+                    results.innerHTML += `<p>❌ Test 3: Table '${table}' - FAIL: ${error.message}</p>`;
+                }
+            }
+
+            results.innerHTML += '<h2>Tests Complete</h2>';
+            results.innerHTML += '<p><strong>If all tests pass, the main app should work!</strong></p>';
+        }
+
+        runTests();
+    </script>
+</body>
+</html>
