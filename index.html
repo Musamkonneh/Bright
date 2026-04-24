@@ -1153,21 +1153,34 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
     <script>
-        npm install @supabase/supabase-js
-        // Supabase configuration (replace these placeholders with your project values)
+        // Supabase configuration
         const SUPABASE_URL = 'https://zvmftgptxrpkgvvmivtr.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_Xh6q2He9p_DM2rl-u5rkow_-PMH18Bn';
-        const SUPABASE_SECRET_KEY = 'sb_secret_mHMX5yYU2uLskmsmM4Zbyg_eBtcM1Sh';
-        // The Edge Function you deploy for admin-created users (see README_SUPABASE.md)
+        
+        // Edge Function URL for admin-created users
+        // Get this URL from Supabase Dashboard → Functions → create-user → Details
+        // Format: https://YOUR_PROJECT_REF.functions.supabase.co/create-user
         const SUPABASE_EDGE_CREATE_USER_URL = 'REPLACE_WITH_EDGE_FUNCTION_URL';
+        
+        // Notification system for sync operations
+        let syncNotifications = [];
+        let edgeFunctionConfigured = false;
 
         let supabaseClient = null;
         try {
             if (!SUPABASE_URL.includes('REPLACE') && !SUPABASE_ANON_KEY.includes('REPLACE')) {
                 supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.info('Supabase client initialized');
+                console.info('✓ Supabase client initialized');
+                
+                // Check if edge function is configured
+                if (!SUPABASE_EDGE_CREATE_USER_URL.includes('REPLACE')) {
+                    edgeFunctionConfigured = true;
+                    console.info('✓ Edge function URL configured');
+                } else {
+                    console.warn('⚠ Edge function URL not configured (admin features will use local-only mode)');
+                }
             } else {
-                console.info('Supabase not configured — running in local mode');
+                console.info('⚠ Supabase not configured — running in local mode');
             }
         } catch (e) {
             console.warn('Supabase init error', e);
@@ -1187,18 +1200,26 @@
 
         async function adminCreateAuthUser(payload) {
             if (!SUPABASE_EDGE_CREATE_USER_URL || SUPABASE_EDGE_CREATE_USER_URL.includes('REPLACE')) {
-                throw new Error('Edge function URL not configured');
+                const errorMsg = 'Edge function not configured. Admin user creation will use local-only mode. ' + 
+                    'To enable cloud-based admin user creation, deploy the edge function and update SUPABASE_EDGE_CREATE_USER_URL in index.html.';
+                console.warn(errorMsg);
+                throw new Error(errorMsg);
             }
-            const res = await fetch(SUPABASE_EDGE_CREATE_USER_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            if (!res.ok) {
-                const text = await res.text();
-                throw new Error(`Edge function failed: ${text}`);
+            try {
+                const res = await fetch(SUPABASE_EDGE_CREATE_USER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(`Edge function error: ${text}`);
+                }
+                return await res.json();
+            } catch (error) {
+                console.error('Edge function call failed:', error);
+                throw new Error('Failed to create user via edge function: ' + (error.message || 'Unknown error'));
             }
-            return res.json();
         }
 
         async function uploadPhotoToStorage(file, destPath) {
@@ -1536,104 +1557,102 @@
             }
         }
 
-        // Sync students to Supabase
+        // Sync students to Supabase (batched for efficiency)
         async function syncStudentsToSupabase() {
-            if (!supabaseClient) return;
+            if (!supabaseClient || !students.length) return;
             try {
-                for (const student of students) {
-                    // Prepare record for database
-                    const dbRecord = {
-                        first_name: student.firstName || '',
-                        last_name: student.lastName || '',
-                        student_id: student.idNumber || '',
-                        email: student.parentContact || '',
-                        enrollment_date: new Date().toISOString().split('T')[0]
-                    };
+                const dbRecords = students.map(student => ({
+                    first_name: student.firstName || '',
+                    last_name: student.lastName || '',
+                    student_id: student.idNumber || '',
+                    email: student.parentContact || '',
+                    enrollment_date: new Date().toISOString().split('T')[0]
+                }));
 
-                    if (student.id) {
-                        // Update existing
-                        await supabaseClient.from('students').update(dbRecord).eq('id', student.id).catch(e => console.warn('Could not sync student', student.id, e));
-                    } else {
-                        // Insert new
-                        await supabaseClient.from('students').insert([dbRecord]).catch(e => console.warn('Could not create student', e));
-                    }
-                }
+                const { error } = await supabaseClient.from('students').upsert(dbRecords);
+                if (error) throw error;
                 console.info('Synced students to Supabase');
+                showSyncNotification('✓ Students synced to cloud', 'success');
             } catch (err) {
                 console.warn('Failed to sync students to Supabase', err);
+                showSyncNotification('✗ Failed to sync students to cloud', 'error');
             }
         }
 
-        // Sync teachers to Supabase
+        // Sync teachers to Supabase (batched for efficiency)
         async function syncTeachersToSupabase() {
-            if (!supabaseClient) return;
+            if (!supabaseClient || !teachers.length) return;
             try {
-                for (const teacher of teachers) {
-                    const dbRecord = {
-                        first_name: teacher.firstName || '',
-                        last_name: teacher.lastName || '',
-                        id_number: teacher.idNumber || '',
-                        email: teacher.email || '',
-                        subjects: Array.isArray(teacher.subjects) ? teacher.subjects : (teacher.subject ? [teacher.subject] : []),
-                        hire_date: new Date().toISOString().split('T')[0]
-                    };
+                const dbRecords = teachers.map(teacher => ({
+                    first_name: teacher.firstName || '',
+                    last_name: teacher.lastName || '',
+                    id_number: teacher.idNumber || '',
+                    email: teacher.email || '',
+                    subjects: Array.isArray(teacher.subjects) ? teacher.subjects : (teacher.subject ? [teacher.subject] : []),
+                    hire_date: new Date().toISOString().split('T')[0]
+                }));
 
-                    if (teacher.id) {
-                        await supabaseClient.from('teachers').update(dbRecord).eq('id', teacher.id).catch(e => console.warn('Could not sync teacher', teacher.id, e));
-                    } else {
-                        await supabaseClient.from('teachers').insert([dbRecord]).catch(e => console.warn('Could not create teacher', e));
-                    }
-                }
+                const { error } = await supabaseClient.from('teachers').upsert(dbRecords);
+                if (error) throw error;
                 console.info('Synced teachers to Supabase');
+                showSyncNotification('✓ Teachers synced to cloud', 'success');
             } catch (err) {
                 console.warn('Failed to sync teachers to Supabase', err);
+                showSyncNotification('✗ Failed to sync teachers to cloud', 'error');
             }
         }
 
-        // Sync grades to Supabase
+        // Sync grades to Supabase (batched for efficiency)
         async function syncGradesToSupabase() {
-            if (!supabaseClient) return;
+            if (!supabaseClient || !grades.length) return;
             try {
-                for (const gradeRecord of grades) {
-                    const dbRecord = {
-                        student_id: gradeRecord.studentId,
-                        class_id: gradeRecord.classId,
-                        subject: gradeRecord.subject,
-                        grade: gradeRecord.grade,
-                        period: gradeRecord.period,
-                        date: gradeRecord.date
-                    };
+                const dbRecords = grades.map(gradeRecord => ({
+                    student_id: gradeRecord.studentId,
+                    class_id: gradeRecord.classId,
+                    subject: gradeRecord.subject,
+                    grade: gradeRecord.grade,
+                    period: gradeRecord.period,
+                    date: gradeRecord.date
+                }));
 
-                    // Upsert based on unique combination
-                    await supabaseClient.from('grades').upsert([dbRecord]).catch(e => console.warn('Could not sync grade', e));
-                }
+                const { error } = await supabaseClient.from('grades').upsert(dbRecords);
+                if (error) throw error;
                 console.info('Synced grades to Supabase');
+                showSyncNotification('✓ Grades synced to cloud', 'success');
             } catch (err) {
                 console.warn('Failed to sync grades to Supabase', err);
+                showSyncNotification('✗ Failed to sync grades to cloud', 'error');
             }
         }
 
-        // Sync attendance to Supabase
+        // Sync attendance to Supabase (batched for efficiency)
         async function syncAttendanceToSupabase() {
-            if (!supabaseClient) return;
+            if (!supabaseClient || !attendance.length) return;
             try {
-                for (const attendanceRecord of attendance) {
+                const dbRecords = [];
+                attendance.forEach(attendanceRecord => {
                     if (Array.isArray(attendanceRecord.records)) {
-                        for (const record of attendanceRecord.records) {
-                            const dbRecord = {
+                        attendanceRecord.records.forEach(record => {
+                            dbRecords.push({
                                 student_id: record.studentId,
                                 class_id: attendanceRecord.classId,
                                 attendance_date: attendanceRecord.date,
                                 status: record.status,
                                 notes: record.notes || ''
-                            };
-                            await supabaseClient.from('attendance').upsert([dbRecord]).catch(e => console.warn('Could not sync attendance', e));
-                        }
+                            });
+                        });
                     }
+                });
+
+                if (dbRecords.length > 0) {
+                    const { error } = await supabaseClient.from('attendance').upsert(dbRecords);
+                    if (error) throw error;
                 }
                 console.info('Synced attendance to Supabase');
+                showSyncNotification('✓ Attendance synced to cloud', 'success');
             } catch (err) {
                 console.warn('Failed to sync attendance to Supabase', err);
+                showSyncNotification('✗ Failed to sync attendance to cloud', 'error');
             }
         }
 
@@ -1658,6 +1677,46 @@
             setTimeout(() => {
                 element.classList.add('hidden');
             }, 3000);
+        }
+
+        // Show sync notification at bottom of screen
+        function showSyncNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type}`;
+            notification.textContent = message;
+            notification.style.cssText = 'position: fixed; bottom: 20px; right: 20px; min-width: 300px; z-index: 10000; max-width: 400px;';
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.3s';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Email validation
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Check if email already exists in system
+        function emailExists(email, excludeUserId = null) {
+            return users.some(u => u.id !== excludeUserId && u.email && u.email.toLowerCase() === email.toLowerCase());
+        }
+
+        // Parse full name into first and last name
+        function parseFullName(fullName) {
+            const parts = (fullName || '').trim().split(/\s+/);
+            if (parts.length === 0) return { firstName: 'User', lastName: '' };
+            if (parts.length === 1) return { firstName: parts[0], lastName: '' };
+            return { firstName: parts[0], lastName: parts.slice(1).join(' ') };
+        }
+
+        // Get display name from user object
+        function getDisplayName(user) {
+            if (!user) return 'Unknown';
+            return user.username || user.full_name || user.email || 'Unknown';
         }
         
         function navigateTo(page) {
@@ -2950,10 +3009,32 @@
         
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('register-username').value;
-            const email = document.getElementById('register-email').value;
+            const username = document.getElementById('register-username').value.trim();
+            const email = document.getElementById('register-email').value.trim();
             const password = document.getElementById('register-password').value;
             const role = document.getElementById('register-role').value;
+
+            // Validate input
+            if (!username || username.length < 2) {
+                showAlert(registerAlert, 'Username must be at least 2 characters', 'danger');
+                return;
+            }
+            if (!isValidEmail(email)) {
+                showAlert(registerAlert, 'Please enter a valid email address', 'danger');
+                return;
+            }
+            if (!password || password.length < 6) {
+                showAlert(registerAlert, 'Password must be at least 6 characters', 'danger');
+                return;
+            }
+            if (!role) {
+                showAlert(registerAlert, 'Please select a role', 'danger');
+                return;
+            }
+            if (emailExists(email)) {
+                showAlert(registerAlert, 'This email is already registered', 'danger');
+                return;
+            }
 
             let userId = null;
             let registeredViaSupabase = false;
@@ -3033,11 +3114,7 @@
             }
 
             // Local fallback registration (only if Supabase registration fails)
-            if (users.some(u => u.email === email)) {
-                showAlert(registerAlert, 'Email already registered', 'danger');
-                return;
-            }
-
+            // Email uniqueness already validated above
             const newUser = {
                 id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
                 username,
