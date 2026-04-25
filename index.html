@@ -1162,8 +1162,10 @@
         
         // Edge Function URL for admin-created users
         // Get this URL from Supabase Dashboard → Functions → create-user → Details
-        // Format: https://YOUR_PROJECT_REF.functions.supabase.co/create-user
-        const SUPABASE_EDGE_CREATE_USER_URL = 'REPLACE_WITH_EDGE_FUNCTION_URL';
+        // Format: https://PROJECT_REF.supabase.co/functions/v1/create-user
+        // This requires the function to be deployed to Supabase first
+        // To deploy: supabase functions deploy create-user
+        const SUPABASE_EDGE_CREATE_USER_URL = 'https://zvmftgptxrpkgvvmivtr.supabase.co/functions/v1/create-user';
         
         // Notification system for sync operations
         let syncNotifications = [];
@@ -1461,12 +1463,65 @@
         // Persistence helpers (localStorage)
         const STORAGE_KEY = 'sfs_data_v1';
 
+        // Check localStorage usage and provide warnings
+        function getStorageStatus() {
+            try {
+                const testKey = '__storage_test__';
+                const testValue = 'test';
+                localStorage.setItem(testKey, testValue);
+                localStorage.removeItem(testKey);
+                
+                // Estimate usage by calculating current data size
+                const current = localStorage.getItem(STORAGE_KEY);
+                const currentSize = current ? new Blob([current]).size : 0;
+                
+                // Typical localStorage limit is 5-10MB (5,242,880 - 10,485,760 bytes)
+                // We'll use 5MB as conservative estimate
+                const LIMIT = 5 * 1024 * 1024; // 5MB
+                const percentUsed = (currentSize / LIMIT) * 100;
+                
+                return {
+                    currentSize,
+                    limit: LIMIT,
+                    percentUsed,
+                    available: Math.max(0, LIMIT - currentSize),
+                    isLow: percentUsed > 80, // Warning threshold
+                    isCritical: percentUsed > 95 // Critical threshold
+                };
+            } catch (e) {
+                console.warn('Failed to check storage status:', e);
+                return { isLow: false, isCritical: false, currentSize: 0, percentUsed: 0 };
+            }
+        }
+
         function saveData() {
             try {
                 const payload = { users, students, teachers, classes, grades, attendance };
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+                const jsonString = JSON.stringify(payload);
+                localStorage.setItem(STORAGE_KEY, jsonString);
+                
+                // Check storage status after save
+                const status = getStorageStatus();
+                if (status.isCritical) {
+                    const msg = `⚠️ CRITICAL: Local storage is ${status.percentUsed.toFixed(0)}% full! Data syncing may fail.`;
+                    console.error(msg);
+                    showSyncNotification(msg, 'danger');
+                } else if (status.isLow) {
+                    const msg = `⚠️ WARNING: Local storage is ${status.percentUsed.toFixed(0)}% full. Consider syncing to cloud.`;
+                    console.warn(msg);
+                    showSyncNotification(msg, 'warning');
+                }
             } catch (e) {
-                console.warn('Failed to save data to localStorage', e);
+                // Handle QuotaExceededError (storage full)
+                if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+                    const msg = '❌ Local storage is FULL! Cannot save more data. Try syncing to Supabase to free up space.';
+                    console.error(msg, e);
+                    showSyncNotification(msg, 'danger');
+                    alert(msg);
+                } else {
+                    console.warn('Failed to save data to localStorage', e);
+                    showSyncNotification('Failed to save data locally', 'error');
+                }
             }
         }
 
@@ -1577,6 +1632,25 @@
                 console.warn('Failed to load from Supabase:', err.message);
                 console.log('⚠ Using local data only (Supabase unavailable)');
             }
+        }
+
+        // Conflict Resolution: Implements "last-write-wins" strategy
+        // When data exists on both client and server, the most recently modified version is kept
+        function resolveConflict(localData, remoteData, fieldName) {
+            if (!localData || !remoteData) return remoteData || localData;
+            
+            const localTime = localData.lastModified ? new Date(localData.lastModified) : new Date(0);
+            const remoteTime = remoteData.lastModified ? new Date(remoteData.lastModified) : new Date(0);
+            
+            if (remoteTime > localTime) {
+                console.log(`⚠ Conflict resolved for ${fieldName} - using remote (newer) version`);
+                return remoteData;
+            } else if (localTime > remoteTime) {
+                console.log(`⚠ Conflict resolved for ${fieldName} - keeping local (newer) version`);
+                return localData;
+            }
+            // If same timestamp, keep local version (stability)
+            return localData;
         }
 
         // Sync students to Supabase (batched for efficiency)
@@ -2359,7 +2433,8 @@
                 grade,
                 parentContact,
                 userId: newUser.id,
-                photo: photoData
+                photo: photoData,
+                lastModified: new Date().toISOString() // Timestamp for conflict resolution
             };
 
             students.push(newStudent);
@@ -2520,7 +2595,8 @@
                 idNumber,
                 subjects: subjects,
                 userId: newUser.id,
-                photo: photoData
+                photo: photoData,
+                lastModified: new Date().toISOString() // Timestamp for conflict resolution
             };
 
             teachers.push(newTeacher);
@@ -2777,7 +2853,8 @@
             attendance.push({
                 classId,
                 date,
-                records
+                records,
+                lastModified: new Date().toISOString() // Timestamp for conflict resolution
             });
             saveData();
             // Sync attendance to Supabase
@@ -2865,7 +2942,8 @@
                         subject,
                         grade: gradeValue,
                         period: period,
-                        date: new Date().toISOString().split('T')[0]
+                        date: new Date().toISOString().split('T')[0],
+                        lastModified: new Date().toISOString() // Timestamp for conflict resolution
                     });
                     updatedStudentIds.add(studentId);
                 });
@@ -3429,18 +3507,18 @@
         } catch (e) {
             console.warn('Failed to ensure default admin', e);
         }
-        // If Supabase is configured, fetch canonical data from remote DB
-        // NOTE: loadFromSupabase is now called AFTER login, not on startup
-        // This prevents RLS policy errors when no user is authenticated
-            // TEMPORARILY DISABLED: Auto session recovery causing issues
-            // Uncomment below to re-enable automatic login
-            /*
+        // If Supabase is configured, attempt to restore user session on page load
+        // This enables users to stay logged in across browser sessions
+        if (supabaseClient) {
             try {
                 const { data: { user } } = await supabaseClient.auth.getUser();
                 if (user) {
+                    console.log('✓ Session found, attempting to restore...');
+                    
                     // Attempt to resolve profile and set currentUser/currentStudent/currentTeacher
                     const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).limit(1).maybeSingle();
-                    currentUser = profile ? { id: user.id, username: profile.full_name || user.email, email: user.email, role: profile.role } : { id: user.id, username: user.email, email: user.email, role: 'student' };
+                    currentUser = profile ? { id: user.id, username: profile.full_name || user.email, email: user.email, role: profile.role, authProvider: 'supabase' } : { id: user.id, username: user.email, email: user.email, role: 'student', authProvider: 'supabase' };
+                    
                     if (currentUser.role === 'student') {
                         const { data: stud } = await supabaseClient.from('students').select('*').eq('user_id', user.id).limit(1).maybeSingle();
                         if (stud) currentStudent = {
@@ -3465,18 +3543,29 @@
                             photo: tch.photo_url
                         };
                     }
+                    
                     if (currentUser) {
                         document.body.className = currentUser.role;
                         loginPage.classList.add('hidden');
                         app.classList.remove('hidden');
                         navigateTo('dashboard');
                         try { adaptToDevice(); } catch(e) {}
+                        
+                        // Load fresh data from cloud after session restoration
+                        try {
+                            await loadFromSupabase();
+                            console.log('✓ Session restored and latest data loaded from Supabase');
+                        } catch (dataErr) {
+                            console.warn('Session restored but failed to sync latest data:', dataErr);
+                            // Continue with local data - data will sync when user makes changes
+                        }
                     }
                 }
             } catch (e) {
-                // ignore session lookup failures
+                console.log('No active session found - showing login page');
+                // Session lookup failed (user not authenticated), show login page
+                // This is normal behavior - not an error
             }
-            */
         }
 
         document.getElementById('attendance-date').value = new Date().toISOString().split('T')[0];
