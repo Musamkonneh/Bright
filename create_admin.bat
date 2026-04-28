@@ -20,5 +20,5 @@ if "%SUPABASE_SERVICE_ROLE_KEY%"=="" (
 )
 
 cd /d "%~dp0"
-node scripts\admin_create_user.js "{\"email\":\"admin@school.com\",\"password\":\"Admin123!\",\"role\":\"admin\",\"full_name\":\"Administrator\"}"
+node scripts\admin_create_user.js "{\"email\":\"admin@school.com\",\"password\":\"admin123\",\"role\":\"admin\",\"full_name\":\"Administrator\"}"
 pause

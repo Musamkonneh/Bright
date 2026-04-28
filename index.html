@@ -595,44 +595,12 @@
                 <button type="submit" class="btn btn-success" style="width: 100%;">Login</button>
             </form>
             <div class="text-center mt-2">
-                <p>Don't have an account? <a href="#" id="show-register">Register</a></p>
                 <p><small><a href="#" id="clear-session" class="text-muted">Clear Session</a></small></p>
             </div>
         </div>
     </div>
 
-    <!-- Register Page (Hidden by default) -->
-    <div id="register-page" class="login-container hidden">
-        <div class="login-box">
-            <h2>Create Account</h2>
-            <p class="text-center mb-3">Theresy Brighter Future Education Center</p>
-            <div id="register-alert" class="alert alert-danger hidden"></div>
-            <form id="register-form">
-                <div class="form-group">
-                    <label for="register-username">Username</label>
-                    <input type="text" id="register-username" required>
-                </div>
-                <div class="form-group">
-                    <label for="register-email">Email</label>
-                    <input type="email" id="register-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="register-password">Password</label>
-                    <input type="password" id="register-password" required>
-                </div>
-                <div class="form-group">
-                    <label for="register-role">Role</label>
-                    <select id="register-role" required>
-                        <option value="">Select Role</option>
-                        <option value="teacher">Teacher</option>
-                        <option value="student">Student</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
-            </form>
-            <p class="text-center mt-2">Already have an account? <a href="#" id="show-login">Login</a></p>
-        </div>
-    </div>
+
 
     <!-- Main App (Hidden by default) -->
     <div id="app" class="hidden">
@@ -1344,16 +1312,11 @@
         
         // DOM Elements
         const loginPage = document.getElementById('login-page');
-        const registerPage = document.getElementById('register-page');
         const app = document.getElementById('app');
         
         // Login/Register Elements
         const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const showRegister = document.getElementById('show-register');
-        const showLogin = document.getElementById('show-login');
         const loginAlert = document.getElementById('login-alert');
-        const registerAlert = document.getElementById('register-alert');
         
         // Navigation Elements
         const logoutBtn = document.getElementById('logout');
@@ -1460,85 +1423,17 @@
             });
         }
 
-        // Persistence helpers (localStorage)
-        const STORAGE_KEY = 'sfs_data_v1';
-
-        // Check localStorage usage and provide warnings
-        function getStorageStatus() {
-            try {
-                const testKey = '__storage_test__';
-                const testValue = 'test';
-                localStorage.setItem(testKey, testValue);
-                localStorage.removeItem(testKey);
-                
-                // Estimate usage by calculating current data size
-                const current = localStorage.getItem(STORAGE_KEY);
-                const currentSize = current ? new Blob([current]).size : 0;
-                
-                // Typical localStorage limit is 5-10MB (5,242,880 - 10,485,760 bytes)
-                // We'll use 5MB as conservative estimate
-                const LIMIT = 5 * 1024 * 1024; // 5MB
-                const percentUsed = (currentSize / LIMIT) * 100;
-                
-                return {
-                    currentSize,
-                    limit: LIMIT,
-                    percentUsed,
-                    available: Math.max(0, LIMIT - currentSize),
-                    isLow: percentUsed > 80, // Warning threshold
-                    isCritical: percentUsed > 95 // Critical threshold
-                };
-            } catch (e) {
-                console.warn('Failed to check storage status:', e);
-                return { isLow: false, isCritical: false, currentSize: 0, percentUsed: 0 };
-            }
-        }
-
+        // Persistence helpers (Supabase only)
+        
         function saveData() {
-            try {
-                const payload = { users, students, teachers, classes, grades, attendance };
-                const jsonString = JSON.stringify(payload);
-                localStorage.setItem(STORAGE_KEY, jsonString);
-                
-                // Check storage status after save
-                const status = getStorageStatus();
-                if (status.isCritical) {
-                    const msg = `⚠️ CRITICAL: Local storage is ${status.percentUsed.toFixed(0)}% full! Data syncing may fail.`;
-                    console.error(msg);
-                    showSyncNotification(msg, 'danger');
-                } else if (status.isLow) {
-                    const msg = `⚠️ WARNING: Local storage is ${status.percentUsed.toFixed(0)}% full. Consider syncing to cloud.`;
-                    console.warn(msg);
-                    showSyncNotification(msg, 'warning');
-                }
-            } catch (e) {
-                // Handle QuotaExceededError (storage full)
-                if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-                    const msg = '❌ Local storage is FULL! Cannot save more data. Try syncing to Supabase to free up space.';
-                    console.error(msg, e);
-                    showSyncNotification(msg, 'danger');
-                    alert(msg);
-                } else {
-                    console.warn('Failed to save data to localStorage', e);
-                    showSyncNotification('Failed to save data locally', 'error');
-                }
-            }
+            // Data is now synced directly to Supabase
+            // No local storage fallback
+            console.log('Data synced to Supabase');
         }
 
         function loadData() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (!raw) return;
-                const obj = JSON.parse(raw);
-                if (obj.users) users = obj.users;
-                if (obj.students) students = obj.students;
-                if (obj.teachers) teachers = obj.teachers;
-                if (obj.classes) classes = obj.classes;
-                if (obj.grades) grades = obj.grades;
-                if (obj.attendance) attendance = obj.attendance;
-            } catch (e) {
-                console.warn('Failed to load data from localStorage', e);
-            }
+            // Data is loaded from Supabase, not localStorage
+            console.log('Data loaded from Supabase');
         }
 
         // If Supabase is configured, load canonical data from the remote DB into the app
@@ -2983,19 +2878,6 @@
         }
         
         // Event Listeners
-        // Login/Register
-        showRegister.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginPage.classList.add('hidden');
-            registerPage.classList.remove('hidden');
-        });
-        
-        showLogin.addEventListener('click', (e) => {
-            e.preventDefault();
-            registerPage.classList.add('hidden');
-            loginPage.classList.remove('hidden');
-        });
-
         // Clear session button
         const clearSessionBtn = document.getElementById('clear-session');
         if (clearSessionBtn) {
@@ -3007,9 +2889,13 @@
                         console.info('Session cleared');
                     }
                     // Clear any local session data
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    alert('Session cleared! Please refresh the page.');
+                    currentUser = null;
+                    currentStudent = null;
+                    currentTeacher = null;
+                    document.body.className = '';
+                    app.classList.add('hidden');
+                    loginPage.classList.remove('hidden');
+                    alert('Session cleared! Please login again.');
                 } catch (error) {
                     console.warn('Failed to clear session:', error);
                     alert('Failed to clear session. Try refreshing the page.');
@@ -3023,292 +2909,66 @@
             const password = document.getElementById('login-password').value;
             const role = document.getElementById('login-role').value;
 
-            // (debugging removed for production)
-
-            // If Supabase is configured, try authenticating against it first
-            if (supabaseClient) {
-                try {
-                    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                    if (error) throw error;
-                    const user = data.user;
-                    // Attempt to load profile from `profiles` table
-                    const { data: profile, error: profileErr } = await supabaseClient
-                        .from('profiles')
-                        .select('*')
-                        .eq('id', user.id)
-                        .single();
-                    // Build currentUser from profile or fallback
-                    currentUser = {
-                        id: user.id,
-                        username: profile ? profile.full_name || email : email,
-                        email,
-                        role: (profile && profile.role) ? profile.role : role,
-                        authProvider: 'supabase'
-                    };
-
-                    // Try to load student/teacher rows linked by user_id
-                    if (currentUser.role === 'student') {
-                        const { data: studentRow } = await supabaseClient.from('students').select('*').eq('user_id', user.id).limit(1).maybeSingle();
-                        if (studentRow) {
-                            currentStudent = studentRow;
-                        }
-                    } else if (currentUser.role === 'teacher') {
-                        const { data: teacherRow } = await supabaseClient.from('teachers').select('*').eq('user_id', user.id).limit(1).maybeSingle();
-                        if (teacherRow) {
-                            currentTeacher = teacherRow;
-                        }
-                    }
-
-                    document.body.className = currentUser.role;
-                    loginPage.classList.add('hidden');
-                    registerPage.classList.add('hidden');
-                    app.classList.remove('hidden');
-                    navigateTo('dashboard');
-                    try { adaptToDevice(); } catch(e) {}
-                    
-                    // Load fresh data from Supabase after successful login
-                    if (supabaseClient) {
-                        try {
-                            await loadFromSupabase();
-                            console.log('✓ Loaded latest data from Supabase after login');
-                        } catch (loadErr) {
-                            console.warn('Failed to load data from Supabase after login:', loadErr);
-                        }
-                    }
-                    
-                    alert(`Welcome back, ${currentUser.username}! (${currentUser.role})`);
-                    return;
-                } catch (err) {
-                    console.warn('Supabase login failed, falling back to local auth', err);
-                    showAlert(loginAlert, (err && err.message) ? err.message : 'Supabase login failed — falling back to local auth');
-                    // allow fallback to local auth below
-                }
+            // Supabase authentication only
+            if (!supabaseClient) {
+                showAlert(loginAlert, 'System not configured. Please contact the administrator.', 'danger');
+                return;
             }
 
-            // Local fallback (for development / before Supabase is configured)
-            const localUser = users.find(u => {
-                if (!u) return false;
-                const uemail = String(u.email || '').toLowerCase().trim();
-                const reqEmail = String(email || '').toLowerCase().trim();
-                const urole = String(u.role || '').toLowerCase().trim();
-                const reqRole = String(role || '').toLowerCase().trim();
-                return uemail === reqEmail && urole === reqRole && u.password === password;
-            });
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                
+                const user = data.user;
+                
+                // Attempt to load profile from `profiles` table
+                const { data: profile, error: profileErr } = await supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+                
+                // Build currentUser from profile or fallback
+                currentUser = {
+                    id: user.id,
+                    username: profile ? profile.full_name || email : email,
+                    email,
+                    role: (profile && profile.role) ? profile.role : role,
+                    authProvider: 'supabase'
+                };
 
-            // (debugging removed for production)
-            if (localUser) {
-                currentUser = localUser;
-                document.body.className = localUser.role;
-                if (localUser.role === 'student') currentStudent = students.find(s => s.userId === localUser.id);
-                if (localUser.role === 'teacher') currentTeacher = teachers.find(t => t.userId === localUser.id);
+                // Try to load student/teacher rows linked by user_id
+                if (currentUser.role === 'student') {
+                    const { data: studentRow } = await supabaseClient.from('students').select('*').eq('user_id', user.id).limit(1).maybeSingle();
+                    if (studentRow) {
+                        currentStudent = studentRow;
+                    }
+                } else if (currentUser.role === 'teacher') {
+                    const { data: teacherRow } = await supabaseClient.from('teachers').select('*').eq('user_id', user.id).limit(1).maybeSingle();
+                    if (teacherRow) {
+                        currentTeacher = teacherRow;
+                    }
+                }
+
+                document.body.className = currentUser.role;
                 loginPage.classList.add('hidden');
-                registerPage.classList.add('hidden');
                 app.classList.remove('hidden');
                 navigateTo('dashboard');
                 try { adaptToDevice(); } catch(e) {}
                 
-                // For local login, load Supabase data if user is admin and Supabase is available
-                if (supabaseClient && localUser.role === 'admin') {
-                    try {
-                        await loadFromSupabase();
-                        console.log('✓ Loaded latest data from Supabase for admin');
-                    } catch (loadErr) {
-                        console.warn('Failed to load data from Supabase for admin:', loadErr);
-                    }
+                // Load fresh data from Supabase after successful login
+                try {
+                    await loadFromSupabase();
+                    console.log('✓ Loaded latest data from Supabase after login');
+                } catch (loadErr) {
+                    console.warn('Failed to load data from Supabase after login:', loadErr);
                 }
                 
-                // If this is a local account using the default password, force a password change
-                try { await checkAndForceChangePassword(currentUser); } catch (e) { /* ignore */ }
-                alert(`Welcome back, ${localUser.username}! (${localUser.role})`);
-            } else {
-                // Provide a helpful diagnostic for failed local login (no sensitive data)
-                try {
-                    const diag = (function(email, role) {
-                        const e = String(email || '').toLowerCase().trim();
-                        const matching = users.filter(u => u && String(u.email || '').toLowerCase().trim() === e);
-                        const summary = matching.map(u => ({ id: u.id, role: u.role, authProvider: u.authProvider || 'local', hasPassword: !!u.password }));
-                        return { attemptedEmail: e, attemptedRole: String(role || '').toLowerCase().trim(), foundCount: matching.length, accounts: summary };
-                    })(email, role);
-                    console.warn('[login] local fallback failed — diagnostic:', diag);
-                    // Debug element removed in production; leave console warning for diagnostics
-                    // If needed re-enable an on-page debug area by creating an element with id="login-debug"
-                    // Friendly alert based on diagnostic
-                    if (diag.foundCount === 0) {
-                        showAlert(loginAlert, 'No local account found for that email. If this is a Supabase account, sign in via Supabase or register locally.', 'danger');
-                    } else {
-                        // If account exists but has no local password, advise Supabase or password reset
-                        const remoteOnly = diag.accounts.every(a => a.authProvider && a.authProvider !== 'local');
-                        if (remoteOnly) {
-                            showAlert(loginAlert, 'An account exists for that email but is remote-only (Supabase). Use Supabase login or run the admin import to create a local mapping.', 'danger');
-                        } else {
-                            showAlert(loginAlert, 'Account found but credentials did not match. Try resetting the password or use Dev controls to inspect users.', 'danger');
-                        }
-                    }
-                } catch (e) {
-                    showAlert(loginAlert, 'Invalid email, password, or role selection');
-                }
+                alert(`Welcome back, ${currentUser.username}! (${currentUser.role})`);
+            } catch (err) {
+                console.warn('Login failed', err);
+                showAlert(loginAlert, (err && err.message) ? err.message : 'Invalid credentials. Please try again or contact the administrator to create your account.', 'danger');
             }
-        });
-        
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('register-username').value.trim();
-            const email = document.getElementById('register-email').value.trim();
-            const password = document.getElementById('register-password').value;
-            const role = document.getElementById('register-role').value;
-
-            // Validate input
-            if (!username || username.length < 2) {
-                showAlert(registerAlert, 'Username must be at least 2 characters', 'danger');
-                return;
-            }
-            if (!isValidEmail(email)) {
-                showAlert(registerAlert, 'Please enter a valid email address', 'danger');
-                return;
-            }
-            if (!password || password.length < 6) {
-                showAlert(registerAlert, 'Password must be at least 6 characters', 'danger');
-                return;
-            }
-            if (!role) {
-                showAlert(registerAlert, 'Please select a role', 'danger');
-                return;
-            }
-            if (emailExists(email)) {
-                showAlert(registerAlert, 'This email is already registered', 'danger');
-                return;
-            }
-
-            let userId = null;
-            let registeredViaSupabase = false;
-
-            if (supabaseClient) {
-                try {
-                    // Sign up user in Supabase Auth
-                    const { data, error } = await supabaseClient.auth.signUp({ 
-                        email, 
-                        password, 
-                        options: { 
-                            data: { 
-                                role, 
-                                full_name: username 
-                            } 
-                        } 
-                    });
-                    if (error) throw error;
-                    
-                    userId = data.user ? data.user.id : null;
-                    registeredViaSupabase = true;
-                    
-                    // The trigger handle_new_user() will create a profiles row automatically
-                    // But we need to update it with email and role from metadata
-                    if (userId) {
-                        try {
-                            // Update the profile with correct email and role
-                            await supabaseClient.from('profiles').update({ 
-                                email: email, 
-                                role: role, 
-                                full_name: username 
-                            }).eq('id', userId);
-                            
-                            // Create student or teacher records
-                            if (role === 'student') {
-                                const nextId = students.filter(s => s.idNumber).length + 1;
-                                await supabaseClient.from('students').insert([{
-                                    profile_id: userId,
-                                    student_id: `ST${String(nextId).padStart(3, '0')}`,
-                                    first_name: username,
-                                    last_name: '',
-                                    email: email,
-                                    enrollment_date: new Date().toISOString().split('T')[0]
-                                }]);
-                            } else if (role === 'teacher') {
-                                const nextId = teachers.filter(t => t.idNumber).length + 1;
-                                await supabaseClient.from('teachers').insert([{
-                                    profile_id: userId,
-                                    id_number: `TC${String(nextId).padStart(3, '0')}`,
-                                    first_name: username,
-                                    last_name: '',
-                                    email: email,
-                                    hire_date: new Date().toISOString().split('T')[0]
-                                }]);
-                            }
-                        } catch (insertErr) {
-                            console.warn('Could not create student/teacher record, but user was created in auth', insertErr);
-                        }
-                    }
-                    
-                    showAlert(registerAlert, 'Registration successful! Your account has been saved to Supabase. Please log in.', 'success');
-                    
-                    // Clear form and go back to login
-                    registerForm.reset();
-                    registerPage.classList.add('hidden');
-                    loginPage.classList.remove('hidden');
-                    return;
-                } catch (err) {
-                    console.warn('Supabase registration failed', err);
-                    const errorMsg = err && err.message ? err.message : 'Supabase registration failed';
-                    showAlert(registerAlert, errorMsg, 'danger');
-                    // Don't fall through to local registration if user already exists in Supabase
-                    if (err.message && err.message.includes('User already registered')) {
-                        return;
-                    }
-                }
-            }
-
-            // Local fallback registration (only if Supabase registration fails)
-            // Email uniqueness already validated above
-            const newUser = {
-                id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
-                username,
-                email,
-                password,
-                role,
-                authProvider: 'local'
-            };
-
-            users.push(newUser);
-            currentUser = newUser;
-
-            registerPage.classList.add('hidden');
-            app.classList.remove('hidden');
-            navigateTo('dashboard');
-            try { adaptToDevice(); } catch(e) {}
-
-            // If student, create student profile
-            if (role === 'student') {
-                const newStudent = {
-                    id: students.length > 0 ? Math.max(...students.map(s => s.id)) + 1 : 1,
-                    firstName: username,
-                    lastName: '',
-                    idNumber: 'ST' + (students.length + 1).toString().padStart(3, '0'),
-                    grade: '1',
-                    parentContact: email,
-                    userId: newUser.id,
-                    photo: null
-                };
-                students.push(newStudent);
-                currentStudent = newStudent;
-            }
-
-            // If teacher, create teacher profile
-            if (role === 'teacher') {
-                const newTeacher = {
-                    id: teachers.length > 0 ? Math.max(...teachers.map(t => t.id)) + 1 : 1,
-                    firstName: username,
-                    lastName: '',
-                    idNumber: 'TC' + (teachers.length + 1).toString().padStart(3, '0'),
-                    subject: 'General',
-                    userId: newUser.id,
-                    photo: null
-                };
-                teachers.push(newTeacher);
-                currentTeacher = newTeacher;
-            }
-
-            // Persist new user/profile locally
-            saveData();
-            addActivity(`New user registered: ${username} (${role})`);
         });
         
         // Navigation
@@ -3408,40 +3068,6 @@
 
         // Developer helpers removed for production
 
-        // Force-change password helper for local accounts that still use the default password
-        async function checkAndForceChangePassword(user) {
-            try {
-                if (!user) return;
-                if (String(user.authProvider || 'local') !== 'local') return;
-                // If the account explicitly requests a change or still uses the default password
-                const isDefault = user.mustChangePassword || (user.password && user.password === 'admin123');
-                if (!isDefault) return;
-                // Prompt user to change password (simple prompt flow)
-                let newPwd = null;
-                while (true) {
-                    newPwd = prompt('Your account is using the default password. Please enter a new password (min 6 chars):', '');
-                    if (newPwd === null) {
-                        alert('You must change the default password to continue. Please login again after changing it.');
-                        return;
-                    }
-                    if (String(newPwd).length < 6) { alert('Password must be at least 6 characters.'); continue; }
-                    const confirmPwd = prompt('Confirm new password:','');
-                    if (confirmPwd === newPwd) break;
-                    alert('Passwords do not match, please try again.');
-                }
-                // Update the stored user (local-only)
-                const u = users.find(x => x && x.id === user.id);
-                if (u) {
-                    u.password = newPwd;
-                    u.mustChangePassword = false;
-                    saveData();
-                    alert('Password updated successfully.');
-                }
-            } catch (e) {
-                console.warn('checkAndForceChangePassword failed', e);
-            }
-        }
-
         // Responsive device adaptation: applies classes and tweaks root font-size on resize/login
         function adaptToDevice() {
             try {
@@ -3471,42 +3097,10 @@
         
     // Initialize
     (async function initApp() {
-        // Load persisted data if available
-        loadData();
+        // Data is now loaded from Supabase only, not localStorage
+        console.log('Initializing School Management System...');
+        console.log('Using Supabase for all data persistence');
 
-        // Ensure a default admin exists for local fallback so admin can always log in
-        try {
-            // Only create a local default admin when Supabase is not configured
-            if (!supabaseClient) {
-                const adminEmail = 'admin@school.com';
-                // find by email case-insensitive
-                const existing = users.find(u => u && String(u.email || '').toLowerCase() === adminEmail.toLowerCase());
-                if (!existing) {
-                    const adminUser = {
-                        id: users.length > 0 ? Math.max(...users.map(u => (typeof u.id === 'number' ? u.id : 0))) + 1 : 1,
-                        username: 'Administrator',
-                        email: adminEmail,
-                        password: 'admin123',
-                        role: 'admin',
-                        authProvider: 'local'
-                    };
-                    users.push(adminUser);
-                    saveData();
-                    try { addActivity('Created default admin account (admin@school.com)'); } catch(e) {}
-                    console.info('Default admin created for local fallback');
-                } else {
-                    // If account exists but has no password and is local, set the default password so login works
-                    if ((existing.authProvider === 'local' || !existing.authProvider) && !existing.password) {
-                        existing.password = 'admin123';
-                        saveData();
-                        try { addActivity('Restored default admin password'); } catch(e) {}
-                        console.info('Restored password for existing local admin');
-                    }
-                }
-            }
-        } catch (e) {
-            console.warn('Failed to ensure default admin', e);
-        }
         // If Supabase is configured, attempt to restore user session on page load
         // This enables users to stay logged in across browser sessions
         if (supabaseClient) {
